@@ -38,13 +38,15 @@ def create_gpu_node_pool():
             accelerator_type=GPU_TYPE)],
         labels={'pool': 'doodle'},
         image_type="COS_CONTAINERD",  # Use a GPU-compatible image type
-        metadata={"nvidia-driver-installer": "cos-stable"}
+        metadata={"install-nvidia-gpu-driver-daemonset": "true"}
     )
+    logging.info(f"Node config: {node_config}")
     node_pool = container_v1.NodePool(
         name=NODE_POOL_NAME,
         initial_node_count=1,
         config=node_config
     )
+    logging.info(f"Node pool: {node_pool}")
     operation = gcp_client.create_node_pool(
         project_id=PROJECT_ID,
         zone=ZONE,
@@ -52,7 +54,6 @@ def create_gpu_node_pool():
         node_pool=node_pool
     )
     logging.info(f"Node pool creation operation: {operation.name}")
-
 
 def delete_node_pool():
     logging.info("Deleting GPU node pool...")

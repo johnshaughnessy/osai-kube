@@ -18,7 +18,12 @@ fi
 
 # Set the namespace and correct label
 NAMESPACE="osai-kube"
-LABEL="app=supervisor"  # Replace with the actual label key-value
+# If $1 is not empty, use it as the label, otherwise use the default label
+if [ -z "$1" ]; then
+    LABEL="app=supervisor"  # Replace with the actual label key-value
+else
+    LABEL="app=$1"
+fi
 
 # Find a pod with the given label
 POD_NAME=$(kubectl get pods --namespace $NAMESPACE -l $LABEL -o jsonpath="{.items[0].metadata.name}")
