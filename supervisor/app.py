@@ -1,8 +1,8 @@
-from flask import Flask, request, jsonify, make_response
+from flask import Flask, request, jsonify, make_response, send_from_directory
 from flask_jwt_extended import JWTManager, jwt_required, create_access_token
 from kubernetes import client, config
 import datetime
-
+import os
 app = Flask(__name__)
 
 # Configure JWT

@@ -16,6 +16,7 @@ spec:
       containers:
         - name: supervisor
           image: $(REGISTRY_URL)/osai-kube/supervisor:latest
+          imagePullPolicy: Always
           env:
             - name: REGISTRY_URL
               valueFrom:
