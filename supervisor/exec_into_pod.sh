@@ -29,5 +29,13 @@ if [ -z "$POD_NAME" ]; then
     exit 1
 fi
 
+# Destination path in the pod
+SERVICE_ACCOUNT_KEY_PATH="/home/john/.ssh/keys/hubs-dev-333333-d279528b68d4.json"
+POD_DEST_PATH="/usr/src/app/service-account-key.json"
+
+# Copy the service account key to the pod
+echo "Copying service account key to the pod..."
+kubectl cp "$SERVICE_ACCOUNT_KEY_PATH" "${NAMESPACE}/${POD_NAME}:${POD_DEST_PATH}"
+
 # Executing a bash shell inside the pod
 kubectl exec -it $POD_NAME --namespace $NAMESPACE -- bash

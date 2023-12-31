@@ -41,6 +41,31 @@ def get_cluster_info():
 def health_check():
     return jsonify({ "msg": "Server is running"}), 200
 
+@app.route('/doodle-start', methods=['GET'])
+def start_doodle():
+    config.load_incluster_config()
+    apps_v1 = client.AppsV1Api()
+
+    # Update replicas to 1
+    apps_v1.patch_namespaced_deployment(name='doodle-deployment', namespace='osai-kube',
+                                        body={'spec': {'replicas': 1}})
+
+    # Check if the service is healthy
+    # Implementation of health check logic goes here
+
+    return jsonify({"message": "Doodle deployment started"}), 200
+
+@app.route('/doodle-stop', methods=['GET'])
+def stop_doodle():
+    config.load_incluster_config()
+    apps_v1 = client.AppsV1Api()
+
+    # Update replicas to 0
+    apps_v1.patch_namespaced_deployment(name='doodle-deployment', namespace='osai-kube',
+                                        body={'spec': {'replicas': 0}})
+
+    return jsonify({"message": "Doodle deployment stopped"}), 200
+
 @app.route('/', defaults={'path': ''})
 @app.route('/<path:path>')
 def serve(path):
@@ -48,6 +73,7 @@ def serve(path):
         return send_from_directory(app.static_folder, path)
     else:
         return send_from_directory(app.static_folder, 'index.html')
+
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0')

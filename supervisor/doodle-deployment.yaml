@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: doodle-deployment
+  namespace: osai-kube
+spec:
+  replicas: 0 # Start with 0 replicas
+  selector:
+    matchLabels:
+      app: doodle
+  template:
+    metadata:
+      labels:
+        app: doodle
+    spec:
+      containers:
+        - name: doodle
+          image: us-central1-docker.pkg.dev/hubs-dev-333333/ocho-osai/osai-kube/doodle:latest
+          resources:
+            limits:
+              nvidia.com/gpu: 1 # Assuming usage of NVIDIA GPUs
+      nodeSelector:
+        pool: doodle # Ensure this matches the label given to the nodes in the doodle node pool

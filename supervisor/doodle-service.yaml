@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: doodle-service
+  namespace: osai-kube
+spec:
+  selector:
+    app: doodle
+  ports:
+    - protocol: TCP
+      port: 80 # Replace with the port your app uses, if different
+      targetPort: 8001 # Replace with the container's port
