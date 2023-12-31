@@ -39,7 +39,7 @@ def get_cluster_info():
 
 @app.route('/health', methods=['GET'])
 def health_check():
-    return "Server is running", 200
+    return jsonify({ "msg": "Server is running"}), 200
 
 @app.route('/', defaults={'path': ''})
 @app.route('/<path:path>')

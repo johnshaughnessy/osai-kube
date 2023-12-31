@@ -1,16 +1,13 @@
-function request(url, options = {}) {
-  return fetch(url, options).then((response) => response.json());
-}
-
 function login() {
   const username = document.getElementById("username").value;
   const password = document.getElementById("password").value;
 
-  request("/login", {
+  fetch("/login", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ username, password }),
   })
+    .then((response) => response.json())
     .then((data) => {
       localStorage.setItem("jwt", data.access_token);
       document.getElementById("response").textContent = "Login successful";
@@ -22,9 +19,10 @@ function login() {
 
 function getClusterInfo() {
   const token = localStorage.getItem("jwt");
-  request("/cluster-info", {
+  fetch("/cluster-info", {
     headers: { Authorization: `Bearer ${token}` },
   })
+    .then((response) => response.json())
     .then((data) => {
       document.getElementById("response").textContent = JSON.stringify(
         data,
@@ -39,11 +37,14 @@ function getClusterInfo() {
 }
 
 function checkHealth() {
-  request("/health")
+  fetch("/health")
+    .then((response) => response.json())
     .then((data) => {
+      console.log(data);
       document.getElementById("response").textContent = data;
     })
-    .catch(() => {
+    .catch((e) => {
+      console.error(e);
       document.getElementById("response").textContent =
         "Server health check failed";
     });
