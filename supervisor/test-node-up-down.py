@@ -16,7 +16,7 @@ GPU_TYPE = "nvidia-tesla-t4"
 GPU_COUNT = 1
 
 # Configure logging
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message}s')
+logging.basicConfig(level=logging.INFO, format='[%(levelname)s]: %(message)s')
 
 # The service account file is in the same directory as this script
 service_account_file = os.path.join(os.path.dirname(__file__), "service-account-key.json")
@@ -30,12 +30,15 @@ config.load_incluster_config()
 kube_client = client.AppsV1Api()
 
 def create_gpu_node_pool():
-    logging.info("Creating GPU node pool...")
+    logging.info("Creating GPU node pool with automatic GPU driver installation...")
     node_config = container_v1.NodeConfig(
         machine_type="n1-standard-4",
         accelerators=[container_v1.AcceleratorConfig(
             accelerator_count=GPU_COUNT,
-            accelerator_type=GPU_TYPE)]
+            accelerator_type=GPU_TYPE)],
+        labels={'pool': 'doodle'},
+        image_type="COS_CONTAINERD",  # Use a GPU-compatible image type
+        metadata={"install-nvidia-gpu-driver": "true"}  # Enable automatic GPU driver installation
     )
     node_pool = container_v1.NodePool(
         name=NODE_POOL_NAME,
@@ -50,6 +53,7 @@ def create_gpu_node_pool():
     )
     logging.info(f"Node pool creation operation: {operation.operation.name}")
 
+
 def delete_node_pool():
     logging.info("Deleting GPU node pool...")
     operation = gcp_client.delete_node_pool(
@@ -58,19 +62,20 @@ def delete_node_pool():
         cluster_id=CLUSTER_NAME,
         node_pool_id=NODE_POOL_NAME
     )
-    logging.info(f"Node pool deletion operation: {operation.operation.name}")
+    logging.info(f"Node pool deletion operation ID: {operation.name}")
 
 def get_dedicated_doodle_node_pool():
-    logging.info("Checking for existing dedicated 'doodle' node pool...")
-    response = gcp_client.list_node_pools(
-        name=f"projects/{PROJECT_ID}/locations/{ZONE}/clusters/{CLUSTER_NAME}"
-    )
-    for node_pool in response.node_pools:
-        if node_pool.name == NODE_POOL_NAME:
-            logging.info("Found existing 'doodle' node pool.")
-            return node_pool
-    logging.info("No dedicated 'doodle' node pool found.")
-    return None
+    try:
+        logging.info("Checking for existing dedicated 'doodle' node pool...")
+        response = gcp_client.list_node_pools(project_id=PROJECT_ID, zone=ZONE, cluster_id=CLUSTER_NAME)
+        for node_pool in response.node_pools:
+            if node_pool.name == NODE_POOL_NAME:
+                return node_pool
+        return None
+    except Exception as e:
+        logging.error(f"Error checking for node pool: {e}")
+        return None
+
 
 def scale_doodle_deployment(replicas):
     logging.info(f"Scaling 'doodle' deployment to {replicas} replicas...")

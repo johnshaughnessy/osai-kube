@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: doodle
-          image: us-central1-docker.pkg.dev/hubs-dev-333333/ocho-osai/osai-kube/doodle:latest
+          image: us-central1-docker.pkg.dev/hubs-dev-333333/ocho-osai/osai-kube/supervisor
           resources:
             limits:
               nvidia.com/gpu: 1 # Assuming usage of NVIDIA GPUs

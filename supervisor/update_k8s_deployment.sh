@@ -18,24 +18,26 @@ else
     kubectl create namespace "$namespace"
 fi
 
-echo "Ensuring that the registry-config ConfigMap exists..."
+echo "Applying registry config map..."
 kubectl apply -f registry-config.yaml --namespace=${namespace}
 
-echo "Ensuring that the supervisor-deployment Deployment exists..."
+echo "Ensuring that the supervisor deployment/service exists..."
 kubectl apply -f supervisor-deployment.yaml --namespace=${namespace}
-
-echo "Ensuring that the supervisor-service service exists..."
 kubectl apply -f supervisor-service.yaml --namespace=${namespace}
 
-echo "Applying role and role binding..."
+echo "Ensuring that the doodle deployment/service exists..."
+kubectl apply -f doodle-deployment.yaml --namespace=${namespace}
+kubectl apply -f doodle-service.yaml --namespace=${namespace}
+
+echo "Applying roles and role bindings..."
 kubectl apply -f role.yaml
 kubectl apply -f rolebinding.yaml
 
-echo "Applying cluster role and role binding..."
+kubectl apply -f deployment-manager-role.yaml
+kubectl apply -f deployment-manager-role-binding.yaml
+
 kubectl apply -f clusterrole.yaml
 kubectl apply -f clusterrolebinding.yaml
-
-
 
 # Updating Kubernetes Deployment
 echo "Updating Kubernetes Deployment..."
