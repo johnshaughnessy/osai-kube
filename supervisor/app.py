@@ -3,7 +3,7 @@ from flask_jwt_extended import JWTManager, jwt_required, create_access_token
 from kubernetes import client, config
 import datetime
 import os
-app = Flask(__name__)
+app = Flask(__name__, static_folder='client')
 
 # Configure JWT
 app.config['JWT_SECRET_KEY'] = 'your_jwt_secret'  # Change this to a random secret key

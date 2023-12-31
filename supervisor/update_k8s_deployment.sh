@@ -24,6 +24,9 @@ kubectl apply -f registry-config.yaml --namespace=${namespace}
 echo "Ensuring that the supervisor-deployment Deployment exists..."
 kubectl apply -f supervisor-deployment.yaml --namespace=${namespace}
 
+echo "Ensuring that the supervisor-service service exists..."
+kubectl apply -f supervisor-service.yaml --namespace=${namespace}
+
 # Updating Kubernetes Deployment
 echo "Updating Kubernetes Deployment..."
 # Set variables
