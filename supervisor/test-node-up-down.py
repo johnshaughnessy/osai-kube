@@ -38,7 +38,7 @@ def create_gpu_node_pool():
             accelerator_type=GPU_TYPE)],
         labels={'pool': 'doodle'},
         image_type="COS_CONTAINERD",  # Use a GPU-compatible image type
-        metadata={"install-nvidia-gpu-driver": "true"}  # Enable automatic GPU driver installation
+        metadata={"nvidia-driver-installer": "cos-stable"}
     )
     node_pool = container_v1.NodePool(
         name=NODE_POOL_NAME,
@@ -51,7 +51,7 @@ def create_gpu_node_pool():
         cluster_id=CLUSTER_NAME,
         node_pool=node_pool
     )
-    logging.info(f"Node pool creation operation: {operation.operation.name}")
+    logging.info(f"Node pool creation operation: {operation.name}")
 
 
 def delete_node_pool():
