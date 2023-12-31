@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: supervisor-deployment
-  namespace: default
+  namespace: osai-kube
 spec:
   replicas: 1
   selector:
