@@ -13,6 +13,7 @@ spec:
       labels:
         app: supervisor
     spec:
+      serviceAccountName: default # Specify the Service Account here
       containers:
         - name: supervisor
           image: $(REGISTRY_URL)/osai-kube/supervisor:latest
@@ -24,4 +25,4 @@ spec:
                   name: registry-config
                   key: registryUrl
           ports:
-            - containerPort: 5000 # Replace with the port your app uses, if different
+            - containerPort: 5000

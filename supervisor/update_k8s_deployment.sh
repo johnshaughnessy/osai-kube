@@ -27,6 +27,16 @@ kubectl apply -f supervisor-deployment.yaml --namespace=${namespace}
 echo "Ensuring that the supervisor-service service exists..."
 kubectl apply -f supervisor-service.yaml --namespace=${namespace}
 
+echo "Applying role and role binding..."
+kubectl apply -f role.yaml
+kubectl apply -f rolebinding.yaml
+
+echo "Applying cluster role and role binding..."
+kubectl apply -f clusterrole.yaml
+kubectl apply -f clusterrolebinding.yaml
+
+
+
 # Updating Kubernetes Deployment
 echo "Updating Kubernetes Deployment..."
 # Set variables

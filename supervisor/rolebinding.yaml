@@ -1,0 +1,13 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: read-nodes
+  namespace: osai-kube
+subjects:
+  - kind: ServiceAccount
+    name: default
+    namespace: osai-kube
+roleRef:
+  kind: Role
+  name: node-reader
+  apiGroup: rbac.authorization.k8s.io
