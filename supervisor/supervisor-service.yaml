@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: supervisor-service
+  namespace: osai-kube
+spec:
+  selector:
+    app: supervisor
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 5000

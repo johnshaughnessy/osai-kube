@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Cluster Info App</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div>
+      <input type="text" id="username" placeholder="Username" />
+      <input type="password" id="password" placeholder="Password" />
+      <button onclick="login()">Login</button>
+    </div>
+    <div>
+      <button onclick="getClusterInfo()">Get Cluster Info</button>
+      <button onclick="checkHealth()">Check Server Health</button>
+    </div>
+    <div id="response"></div>
+    <script src="main.js"></script>
+  </body>
+</html>
