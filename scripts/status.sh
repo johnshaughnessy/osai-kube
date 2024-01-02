@@ -26,8 +26,11 @@ for arg in "$@"
 do
     if [ "$arg" == "--no-color" ]; then
         NO_COLOR=1
-    elif [ "$arg" == "--skip-config-check" ]; then
+    elif [ "$arg" == "--no-config" ]; then
         SKIP_CONFIG_CHECK=1
+    else
+        print_message "Unknown argument: $arg. Accepted arguments: --no-color --no-config" "ERROR"
+        exit 1
     fi
 done
 
