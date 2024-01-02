@@ -4,6 +4,7 @@ The purpose of this repo is run open source AI apps within an auto-scaling Kuber
 
 # Setup
 
+
 ## Install `google-cloud-sdk`
 
 Install `gcloud` following the [installation instructions](https://cloud.google.com/sdk/docs/install-sdk).
@@ -24,6 +25,8 @@ gcloud config set project $GCP_PROJECT
 Replace `$GCP_PROJECT` with the name of your project.
 
 ## Set up a basic kubernetes cluster on GCP.
+
+## Configure `scripts/config.ini`
 
 ## Build and run the supervisor
 
