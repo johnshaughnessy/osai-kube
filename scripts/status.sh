@@ -19,20 +19,54 @@ print_message() {
 
 # Initialize flags
 NO_COLOR=0
-SKIP_CONFIG_CHECK=0
+SKIP_CONFIG_CHECK=1
+SKIP_KUBERNETES_CHECK=1
+SKIP_ARTIFACT_REGISTRY_CHECK=1
 
 # Parse command line arguments
 for arg in "$@"
 do
     if [ "$arg" == "--no-color" ]; then
         NO_COLOR=1
-    elif [ "$arg" == "--no-config" ]; then
-        SKIP_CONFIG_CHECK=1
+    elif [ "$arg" == "--config" ]; then
+        SKIP_CONFIG_CHECK=0
+    elif [ "$arg" == "--kube" ]; then
+        SKIP_KUBERNETES_CHECK=0
+    elif [ "$arg" == "--docker" ]; then
+        SKIP_ARTIFACT_REGISTRY_CHECK=0
+    elif [ "$arg" == "--all" ]; then
+        SKIP_CONFIG_CHECK=0
+        SKIP_KUBERNETES_CHECK=0
+        SKIP_ARTIFACT_REGISTRY_CHECK=0
     else
-        print_message "Unknown argument: $arg. Accepted arguments: --no-color --no-config" "ERROR"
+        print_message "Unknown argument: $arg. Accepted arguments:
+    --no-color : Do not print color.
+    --config   : Enable configuration check.
+    --kube     : Enable Kubernetes check.
+    --docker   : Enable artifact registry check.
+    --all      : Enable all checks.
+" "ERROR"
         exit 1
     fi
 done
+
+# If no arguments are provided, print usage and exit.
+if [ $# -eq 0 ]; then
+    print_message "No arguments provided.
+Usage:
+
+    status.sh [options]
+
+Options:
+    --no-color : Do not print color.
+    --config   : Enable configuration check.
+    --kube     : Enable Kubernetes check.
+    --docker   : Enable artifact registry check.
+    --all      : Enable all checks.
+" "ERROR"
+    exit 1
+fi
+
 
 if [ $SKIP_CONFIG_CHECK -eq 0 ]; then
 
@@ -104,45 +138,106 @@ else
     print_message "Skipping configuration check." "INFO"
 fi
 
-print_message "Checking status of live cluster." "INFO"
+if [ $SKIP_KUBERNETES_CHECK -eq 0 ]; then
 
-print_message "Listing node pools" "INFO"
-echo
+    print_message "Checking status of live cluster." "INFO"
 
-gcloud container node-pools list --cluster="$K8S_CLUSTER_NAME"
+    print_message "Listing node pools" "INFO"
+    echo
 
-echo
-print_message "Listing nodes" "INFO"
-echo
+    gcloud container node-pools list --cluster="$K8S_CLUSTER_NAME"
 
-kubectl get nodes
+    echo
+    print_message "Listing nodes" "INFO"
+    echo
 
-echo
-print_message "Listing pods in osai-kube" "INFO"
-echo
+    kubectl get nodes
 
-kubectl get pods --namespace osai-kube
+    echo
+    print_message "Listing pods in osai-kube" "INFO"
+    echo
 
-echo
-print_message "Listing pods in kube-system" "INFO"
-echo
+    kubectl get pods --namespace osai-kube
 
-kubectl get pods --namespace kube-system --context "$K8S_CONTEXT_NAME"
+    echo
+    print_message "Listing pods in kube-system" "INFO"
+    echo
 
-echo
-print_message "Listing deployments in osai-kube" "INFO"
-echo
+    kubectl get pods --namespace kube-system --context "$K8S_CONTEXT_NAME"
 
-kubectl get deployments --namespace osai-kube
+    echo
+    print_message "Listing deployments in osai-kube" "INFO"
+    echo
 
-echo
-print_message "Listing services in osai-kube" "INFO"
-echo
+    kubectl get deployments --namespace osai-kube
 
-kubectl get services --namespace osai-kube
+    echo
+    print_message "Listing services in osai-kube" "INFO"
+    echo
 
-echo
-print_message "Listing config maps in osai-kube" "INFO"
-echo
+    kubectl get services --namespace osai-kube
 
-kubectl get configmaps --namespace osai-kube
+    echo
+    print_message "Listing config maps in osai-kube" "INFO"
+    echo
+
+    kubectl get configmaps --namespace osai-kube
+
+else
+
+    print_message "Skipping Kubernetes check." "INFO"
+
+fi
+
+process_images() {
+    IMAGES=$(gcloud container images list --repository="$1" --format="value(NAME)")
+    for IMAGE in $IMAGES; do
+        # Get the JSON data for each image
+        JSON_DATA=$(gcloud container images list-tags "$IMAGE" --limit=1 --sort-by=~TIMESTAMP --format="json(tags, digest, timestamp)")
+
+        # Parse JSON and format the output
+        if [ ! -z "$JSON_DATA" ]; then
+            SHORT_IMAGE_NAME=$(echo "$IMAGE" | sed "s|$ARTIFACT_REGISTRY/||g")
+            TAGS=$(echo $JSON_DATA | jq -r '.[0].tags | join(", ")')
+            FULL_DIGEST=$(echo $JSON_DATA | jq -r '.[0].digest')
+            # Truncate the digest to the first 12 characters
+            DIGEST=${FULL_DIGEST:7:12}
+            TIMESTAMP=$(echo $JSON_DATA | jq -r '.[0].timestamp.datetime')
+
+            # Combine the formatted information
+            FORMATTED_INFO="$SHORT_IMAGE_NAME|$TAGS|$DIGEST|$TIMESTAMP"
+            image_info_list+=("$FORMATTED_INFO")
+        fi
+    done
+}
+
+if [ $SKIP_ARTIFACT_REGISTRY_CHECK -eq 0 ]; then
+    print_message "Checking artifact registry." "INFO"
+
+    # Activate the service account
+    gcloud auth activate-service-account --key-file=$SERVICE_ACCOUNT_FILE > /dev/null 2>&1
+
+    # Configure Docker to use gcloud as a credential helper
+    gcloud auth configure-docker --quiet --verbosity="error" > /dev/null 2>&1
+
+    # Initialize an array to store the image information
+    declare -a image_info_list
+    image_info_list=("IMAGE|TAG|DIGEST|TIMESTAMP")
+
+    # Fetch all top-level repositories
+    TOP_LEVEL_REPOS=$(gcloud container images list --repository="$ARTIFACT_REGISTRY" --format="value(NAME)")
+
+    for REPO in $TOP_LEVEL_REPOS; do
+        if [[ "$REPO" =~ "johnshaughnessy" ]]; then
+            SUB_REPOS=$(gcloud container images list --repository="$REPO" --format="value(NAME)")
+            for SUB_REPO in $SUB_REPOS; do
+                process_images "$SUB_REPO"
+            done
+        else
+            process_images "$REPO"
+        fi
+    done
+
+    # Output the data using column
+    printf "%s\n" "${image_info_list[@]}" | column -t -s '|'
+fi

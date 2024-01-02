@@ -20,7 +20,7 @@ full_image_name(){
     echo "${ARTIFACT_REGISTRY}/${1}:${2}"
 }
 
-SUPERVISOR_IMAGE_NAME=$(full_image_name "supervisor" "latest")
+SUPERVISOR_IMAGE_NAME=$(full_image_name "osai-kube/supervisor" "latest")
 
 gcloud auth configure-docker --quiet --verbosity="error" > /dev/null 2>&1
 print_message "Uploading supervisor image to artifact registry." "INFO"

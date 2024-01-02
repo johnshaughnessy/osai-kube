@@ -71,3 +71,12 @@ configs=$(find $CONFIG_DIR -type f -name "*.yaml")
 for config in $configs; do
     apply_k8s_config $config
 done
+
+full_image_name(){
+    echo "${ARTIFACT_REGISTRY}/${1}:${2}"
+}
+
+SUPERVISOR_IMAGE_NAME=$(full_image_name "osai-kube/supervisor" "latest")
+print_message "Updating supervisor image in deployment." "INFO"
+
+kubectl set image deployment/supervisor supervisor="${SUPERVISOR_IMAGE_NAME}" --namespace=${OSAI_KUBE_NAMESPACE}

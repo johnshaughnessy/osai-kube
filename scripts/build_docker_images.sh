@@ -34,7 +34,7 @@ full_image_name(){
 
 # Build the supervisor image (if not skipped)
 if [ $NO_SUPERVISOR -eq 0 ]; then
-    SUPERVISOR_IMAGE_NAME=$(full_image_name "supervisor" "latest")
+    SUPERVISOR_IMAGE_NAME=$(full_image_name "osai-kube/supervisor" "latest")
     SUPERVISOR_DOCKER_FILE="Dockerfile.supervisor"
     SUPERVISOR_DOCKER_CONTEXT="$SCRIPT_DIR/../supervisor"
 

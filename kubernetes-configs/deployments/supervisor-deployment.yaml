@@ -16,10 +16,10 @@ spec:
       serviceAccountName: default # Specify the Service Account here
       containers:
         - name: supervisor
-          image: $(REGISTRY_URL)/osai-kube/supervisor:latest
+          image: $(ARTIFACT_REGISTRY)/osai-kube/supervisor:latest
           imagePullPolicy: Always
           env:
-            - name: REGISTRY_URL
+            - name: ARTIFACT_REGISTRY
               valueFrom:
                 configMapKeyRef:
                   name: registry-config
