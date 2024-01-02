@@ -134,8 +134,6 @@ if [ $SKIP_CONFIG_CHECK -eq 0 ]; then
     else
         print_message "Artifact registry: $ARTIFACT_REGISTRY" "OK"
     fi
-else
-    print_message "Skipping configuration check." "INFO"
 fi
 
 if [ $SKIP_KUBERNETES_CHECK -eq 0 ]; then
@@ -183,9 +181,7 @@ if [ $SKIP_KUBERNETES_CHECK -eq 0 ]; then
 
     kubectl get configmaps --namespace osai-kube
 
-else
-
-    print_message "Skipping Kubernetes check." "INFO"
+    echo
 
 fi
 
