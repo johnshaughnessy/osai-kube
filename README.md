@@ -24,6 +24,13 @@ gcloud config set project $GCP_PROJECT
 
 Replace `$GCP_PROJECT` with the name of your project.
 
+## Install docker (optionally with buildkit)
+
+Arch Linux:
+```sh
+pacman -S docker docker-buildx
+```
+
 ## Set up a basic kubernetes cluster on GCP.
 
 ## Configure `scripts/config.ini`

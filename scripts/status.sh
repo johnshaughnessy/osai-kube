@@ -1,5 +1,8 @@
 #!/bin/bash
 
+SCRIPT_DIR="$(dirname "$0")"
+source "$SCRIPT_DIR/set_environment_variables.sh"
+
 # Function to display messages
 print_message() {
     if [ "$2" == "ERROR" ]; then
@@ -27,9 +30,6 @@ do
         SKIP_CONFIG_CHECK=1
     fi
 done
-
-SCRIPT_DIR="$(dirname "$0")"
-source "$SCRIPT_DIR/set_environment_variables.sh"
 
 if [ $SKIP_CONFIG_CHECK -eq 0 ]; then
 
