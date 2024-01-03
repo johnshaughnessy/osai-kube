@@ -35,9 +35,43 @@ pacman -S docker docker-buildx
 
 ## Configure `scripts/config.ini`
 
-## Build and run the supervisor
+# Using the scripts
 
-Follow the instructions in [`supervisor/README.md`](./supervisor/README.md).
+## `scripts/config.ini`
+
+This config file must be edited before running any of the scripts.
+
+You can also add/remove/edit the configuration for the apps you want to enable in the cluster in this file.
+
+## `scripts/status.sh`
+
+Use this script to validate your config file, check status of the cluster, and fetch from artifact registry.
+
+## `scripts/logs.sh`
+
+Use this script to fetch logs from the cluster.
+
+## `scripts/shell.sh`
+
+Use this script to open a shell in a pod running in the cluster.
+
+## `scripts/build_docker_images.sh`
+
+Builds all the docker images for the apps in the cluster.
+
+## `scripts/push_docker_images.sh`
+
+Pushes all the docker images for the apps in the cluster to the artifact registry.
+
+## `scripts/set_enviroment_variables.sh`
+
+Helper script for the other scripts. Can also be sourced in your shell to set the environment variables according to your `config.ini`.
+
+## `scripts/deploy.sh`
+
+Applies all of the manifests in the `kubernetes-manifests` directory to the cluster.
+
+
 
 
 

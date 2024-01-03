@@ -1,4 +1,7 @@
 #!/bin/bash
+#
+# Validate your config file, check status of the cluster, and fetch from artifact registry.
+#
 
 SCRIPT_DIR="$(dirname "$0")"
 source "$SCRIPT_DIR/set_environment_variables.sh"

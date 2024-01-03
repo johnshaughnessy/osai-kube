@@ -3,7 +3,7 @@
 SCRIPT_DIR="$(dirname "$0")"
 source "$SCRIPT_DIR/set_environment_variables.sh"
 
-CONFIG_DIR="$SCRIPT_DIR/../kubernetes-configs"
+MANIFEST_DIR="$SCRIPT_DIR/../kubernetes-manifests"
 
 print_message() {
     if [ "$2" == "ERROR" ]; then
@@ -38,7 +38,7 @@ k8s_apply_config() {
     result=$?
 
     filename=$(basename $1)
-    filename_with_parent=$(echo $1 | sed "s|$CONFIG_DIR/||g")
+    filename_with_parent=$(echo $1 | sed "s|$MANIFEST_DIR/||g")
 
     if [ $result -ne 0 ]; then
         print_message "Failed to apply $(basename $1): $output" "ERROR"
@@ -59,7 +59,7 @@ k8s_apply_config() {
 
 update_deployment_image() {
     local deployment_file="$1"
-    local filename_with_parent=$(echo $deployment_file | sed "s|$CONFIG_DIR/||g")
+    local filename_with_parent=$(echo $deployment_file | sed "s|$MANIFEST_DIR/||g")
     local image_name="$2"
 
     local image_digest=$(gcloud container images list-tags "$ARTIFACT_REGISTRY/$image_name" --limit=1 --sort-by=~TIMESTAMP --format="json" | jq -r ".[0].digest")
@@ -83,22 +83,22 @@ update_deployment_image() {
 }
 
 
-SUPERVISOR_DEPLOYMENT_FILE="$CONFIG_DIR/deployments/supervisor-deployment.yaml"
+SUPERVISOR_DEPLOYMENT_FILE="$MANIFEST_DIR/deployments/supervisor-deployment.yaml"
 SUPERVISOR_IMAGE_NAME="osai-kube/supervisor"
 update_deployment_image "$SUPERVISOR_DEPLOYMENT_FILE" "$SUPERVISOR_IMAGE_NAME"
 
-DOODLE_DEPLOYMENT_FILE="$CONFIG_DIR/deployments/doodle-deployment.yaml"
+DOODLE_DEPLOYMENT_FILE="$MANIFEST_DIR/deployments/doodle-deployment.yaml"
 DOODLE_IMAGE_NAME="browserlab/doodle"
 update_deployment_image "$DOODLE_DEPLOYMENT_FILE" "$DOODLE_IMAGE_NAME"
 
 # Apply namespace configs first
-namespace_configs=$(find $CONFIG_DIR/namespaces -type f -name "*.yaml")
+namespace_configs=$(find $MANIFEST_DIR/namespaces -type f -name "*.yaml")
 for config in $namespace_configs; do
     k8s_apply_config $config
 done
 
 # Ignore namespace and pod configs
-configs=$(find $CONFIG_DIR -type f -name "*.yaml" ! -path "$CONFIG_DIR/namespaces/*" ! -path "$CONFIG_DIR/pods/*")
+configs=$(find $MANIFEST_DIR -type f -name "*.yaml" ! -path "$MANIFEST_DIR/namespaces/*" ! -path "$MANIFEST_DIR/pods/*")
 for config in $configs; do
     k8s_apply_config $config
 done
