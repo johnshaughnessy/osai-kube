@@ -20,14 +20,25 @@ full_image_name(){
     echo "${ARTIFACT_REGISTRY}/${1}:${2}"
 }
 
-SUPERVISOR_IMAGE_NAME=$(full_image_name "osai-kube/supervisor" "latest")
-
 gcloud auth configure-docker --quiet --verbosity="error" > /dev/null 2>&1
-print_message "Uploading supervisor image to artifact registry." "INFO"
-docker push --quiet $SUPERVISOR_IMAGE_NAME > /dev/null 2>&1
-if [ $? -ne 0 ]; then
-    print_message "Failed to upload supervisor image to artifact registry." "ERROR"
-    exit 1
-else
-    print_message "Uploaded supervisor image to artifact registry." "OK"
+
+push_to_artifact_registry(){
+    IMAGE_NAME=$1
+    SHORT_IMAGE_NAME=$2
+    print_message "Uploading $SHORT_IMAGE_NAME image to artifact registry." "INFO"
+    docker push --quiet $IMAGE_NAME > /dev/null 2>&1
+    if [ $? -ne 0 ]; then
+        print_message "Failed to upload $SHORT_IMAGE_NAME image to artifact registry." "ERROR"
+        exit 1
+    else
+        print_message "Uploaded $SHORT_IMAGE_NAME image to artifact registry." "OK"
+    fi
+}
+
+SUPERVISOR_FULL_IMAGE_NAME=$(full_image_name "osai-kube/supervisor" "latest")
+push_to_artifact_registry $SUPERVISOR_FULL_IMAGE_NAME "supervisor"
+
+if [ "$ENABLE_DOODLE" == "1" ]; then
+    DOODLE_FULL_IMAGE_NAME=$(full_image_name $DOODLE_IMAGE_NAME "latest")
+    push_to_artifact_registry $DOODLE_FULL_IMAGE_NAME "doodle"
 fi
