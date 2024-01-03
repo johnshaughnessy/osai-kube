@@ -72,11 +72,7 @@ for config in $configs; do
     apply_k8s_config $config
 done
 
-full_image_name(){
-    echo "${ARTIFACT_REGISTRY}/${1}:${2}"
-}
-
-SUPERVISOR_IMAGE_NAME=$(full_image_name "osai-kube/supervisor" "latest")
-print_message "Updating supervisor image in deployment." "INFO"
-
-kubectl set image deployment/supervisor supervisor="${SUPERVISOR_IMAGE_NAME}" --namespace=${OSAI_KUBE_NAMESPACE}
+SUPERVISOR_IMAGE_DIGEST=$(gcloud container images list-tags "$ARTIFACT_REGISTRY/osai-kube/supervisor" --limit=1 --sort-by=~TIMESTAMP --format="json" | jq -r ".[0].digest")
+SUPERVISOR_IMAGE="${ARTIFACT_REGISTRY}/osai-kube/supervisor@$SUPERVISOR_IMAGE_DIGEST"
+print_message "Updating supervisor image to $SUPERVISOR_IMAGE." "INFO"
+kubectl set image deployment/supervisor-deployment supervisor="${SUPERVISOR_IMAGE}"

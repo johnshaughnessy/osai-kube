@@ -23,6 +23,6 @@ spec:
               valueFrom:
                 configMapKeyRef:
                   name: registry-config
-                  key: registryUrl
+                  key: artifactRegistry
           ports:
             - containerPort: 5000
