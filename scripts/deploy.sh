@@ -3,26 +3,24 @@
 SCRIPT_DIR="$(dirname "$0")"
 source "$SCRIPT_DIR/set_environment_variables.sh"
 
-CONFIG_DIR="$SCRIPT_DIR/../kubernetes-configs/"
+CONFIG_DIR="$SCRIPT_DIR/../kubernetes-configs"
 
-
-# Function to display messages
 print_message() {
     if [ "$2" == "ERROR" ]; then
         # Red color for error
-        [ "$NO_COLOR" == "1" ] && echo "[osai-kube] [$2] $1" || echo -e "[osai-kube] [\033[0;31m$2\033[0m] $1"
+        [ "$NO_COLOR" == "1" ] && echo "[osai-kube] [$2]      $1" || echo -e "[osai-kube] [\033[0;31m$2\033[0m]      $1"
     elif [ "$2" == "OK" ]; then
         # Green color for OK
-        [ "$NO_COLOR" == "1" ] && echo "[osai-kube] [$2] $1" || echo -e "[osai-kube] [\033[0;32m$2\033[0m] $1"
+        [ "$NO_COLOR" == "1" ] && echo "[osai-kube] [$2] $1" || echo -e "[osai-kube] [\033[0;32m$2\033[0m]         $1"
     elif [ "$2" == "UNCHANGED" ]; then
         # Gray color for unchanged
-        [ "$NO_COLOR" == "1" ] && echo "[osai-kube] [OK] $1" || echo -e "[osai-kube] [\033[0;37m$2\033[0m] $1"
+        [ "$NO_COLOR" == "1" ] && echo "[osai-kube] [OK]  $1" || echo -e "[osai-kube] [\033[0;37m$2\033[0m]  $1"
     elif [ "$2" == "CREATED" ]; then
         # Green color for created
-        [ "$NO_COLOR" == "1" ] && echo "[osai-kube] [$2] $1" || echo -e "[osai-kube] [\033[0;32m$2\033[0m] $1"
+        [ "$NO_COLOR" == "1" ] && echo "[osai-kube] [$2]    $1" || echo -e "[osai-kube] [\033[0;32m$2\033[0m]    $1"
     elif [ "$2" == "UPDATED" ]; then
         # Green color for updated
-        [ "$NO_COLOR" == "1" ] && echo "[osai-kube] [$2] $1" || echo -e "[osai-kube] [\033[0;32m$2\033[0m] $1"
+        [ "$NO_COLOR" == "1" ] && echo "[osai-kube] [$2]    $1" || echo -e "[osai-kube] [\033[0;32m$2\033[0m]    $1"
     elif [ "$2" == "CONFIGURED" ]; then
         # Green color for configured
         [ "$NO_COLOR" == "1" ] && echo "[osai-kube] [$2] $1" || echo -e "[osai-kube] [\033[0;32m$2\033[0m] $1"
@@ -37,7 +35,7 @@ k8s_apply_config() {
     result=$?
 
     filename=$(basename $1)
-    filename_with_parent=$(echo $1 | sed "s|$CONFIG_DIR||g")
+    filename_with_parent=$(echo $1 | sed "s|$CONFIG_DIR/||g")
 
     if [ $result -ne 0 ]; then
         print_message "Failed to apply $(basename $1): $output" "ERROR"
@@ -56,23 +54,9 @@ k8s_apply_config() {
     fi
 }
 
-OSAI_KUBE_NAMESPACE="osai-kube"
-# Ensure osai-kube namespace exists
-if kubectl get namespace $OSAI_KUBE_NAMESPACE > /dev/null 2>&1; then
-    print_message "Namespace $OSAI_KUBE_NAMESPACE exists." "OK"
-else
-    kubectl create namespace "$namespace"
-    if kubectl get namespace $OSAI_KUBE_NAMESPACE > /dev/null 2>&1; then
-        print_message "Created namespace: $OSAI_KUBE_NAMESPACE." "OK"
-    else
-        print_message "Failed to create namespace $OSAI_KUBE_NAMESPACE." "ERROR"
-        exit 1
-    fi
-fi
-
 update_deployment_image() {
     local deployment_file="$1"
-    local filename_with_parent=$(echo $deployment_file | sed "s|$CONFIG_DIR||g")
+    local filename_with_parent=$(echo $deployment_file | sed "s|$CONFIG_DIR/||g")
     local image_name="$2"
 
     local image_digest=$(gcloud container images list-tags "$ARTIFACT_REGISTRY/$image_name" --limit=1 --sort-by=~TIMESTAMP --format="json" | jq -r ".[0].digest")
@@ -95,6 +79,7 @@ update_deployment_image() {
     rm "${deployment_file}.bak"
 }
 
+
 SUPERVISOR_DEPLOYMENT_FILE="$CONFIG_DIR/deployments/supervisor-deployment.yaml"
 SUPERVISOR_IMAGE_NAME="osai-kube/supervisor"
 update_deployment_image "$SUPERVISOR_DEPLOYMENT_FILE" "$SUPERVISOR_IMAGE_NAME"
@@ -103,8 +88,13 @@ DOODLE_DEPLOYMENT_FILE="$CONFIG_DIR/deployments/doodle-deployment.yaml"
 DOODLE_IMAGE_NAME="browserlab/doodle"
 update_deployment_image "$DOODLE_DEPLOYMENT_FILE" "$DOODLE_IMAGE_NAME"
 
-configs=$(find $CONFIG_DIR -type f -name "*.yaml")
+# Apply namespace configs first
+namespace_configs=$(find $CONFIG_DIR/namespaces -type f -name "*.yaml")
+for config in $namespace_configs; do
+    k8s_apply_config $config
+done
 
+configs=$(find $CONFIG_DIR -type f -name "*.yaml" ! -path "$CONFIG_DIR/namespaces/*")
 for config in $configs; do
     k8s_apply_config $config
 done
