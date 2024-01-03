@@ -9,10 +9,10 @@ print_message() {
         [ "$NO_COLOR" == "1" ] && echo "[osai-kube] [$2] $1" || echo -e "[osai-kube] [\033[0;31m$2\033[0m] $1"
     elif [ "$2" == "OK" ]; then
         # Green color for OK
-        [ "$NO_COLOR" == "1" ] && echo "[osai-kube] [$2] $1" || echo -e "[osai-kube] [\033[0;32m$2\033[0m] $1"
+        [ "$NO_COLOR" == "1" ] && echo "[osai-kube] [$2] $1" || echo -e "[osai-kube] [\033[0;32m$2\033[0m]    $1"
     else
         # No color for other messages
-        echo "[osai-kube] [$2] $1"
+        echo "[osai-kube] [$2]   $1"
     fi
 }
 
