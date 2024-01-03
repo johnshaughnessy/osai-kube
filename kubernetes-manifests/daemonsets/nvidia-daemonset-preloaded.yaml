@@ -27,6 +27,7 @@ metadata:
   namespace: kube-system
   labels:
     k8s-app: nvidia-driver-installer
+    cloud.google.com/gke-gpu-driver-version: "latest"
 spec:
   selector:
     matchLabels:
@@ -116,8 +117,8 @@ spec:
             echo "GPU driver is already installed, the installed version may or may not be the driver version being tried to install, skipping installation"
             exit 0
           else
-            echo "No GPU driver module detected, installting now"
-            /cos-gpu-installer install
+            echo "No GPU driver module detected, installing now"
+            /cos-gpu-installer install --version=latest
           fi
       - image: "gcr.io/gke-release/nvidia-partition-gpu@sha256:e226275da6c45816959fe43cde907ee9a85c6a2aa8a429418a4cadef8ecdb86a"
         name: partition-gpus

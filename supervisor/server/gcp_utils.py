@@ -38,12 +38,17 @@ def create_gpu_node_pool(config_data):
     credentials = service_account.Credentials.from_service_account_file(service_account_file)
     gcp_client = container_v1.ClusterManagerClient(credentials=credentials)
 
+    labels = {
+        'pool': node_pool_label,
+        'cloud.google.com/gke-gpu-driver-version': 'latest'
+    }
+
     node_config = container_v1.NodeConfig(
         machine_type=machine_type,
         accelerators=[container_v1.AcceleratorConfig(
             accelerator_count=gpu_count,
             accelerator_type=gpu_type)],
-        labels={'pool': node_pool_label},
+        labels=labels,
         image_type="COS_CONTAINERD"
     )
 
