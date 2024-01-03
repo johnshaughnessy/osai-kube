@@ -16,7 +16,7 @@ spec:
       serviceAccountName: default # Specify the Service Account here
       containers:
         - name: supervisor
-          image: us-central1-docker.pkg.dev/hubs-dev-333333/ocho-osai/osai-kube/supervisor@sha256:4a099c619f5d380239801d526ba22fae43beef23a78df336b4074639cb464ad0
+          image: us-central1-docker.pkg.dev/hubs-dev-333333/ocho-osai/osai-kube/supervisor@sha256:9cddf9d1138717df32c7f1f7c97e5763762b4e692a74b2b47b99a6d97c3ea58b
           imagePullPolicy: Always
           env:
             - name: ARTIFACT_REGISTRY
