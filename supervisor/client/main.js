@@ -9,12 +9,13 @@ function login() {
   })
     .then((response) => response.json())
     .then((data) => {
-      console.log(JSON.stringify(data, null, 2));
+      logResponse("Login response", data);
       localStorage.setItem("jwt", data.access_token);
-      document.getElementById("response").textContent = "Login successful";
+      updateResponse("Login successful");
     })
-    .catch(() => {
-      document.getElementById("response").textContent = "Login failed";
+    .catch((error) => {
+      logResponse("Login error", error);
+      updateResponse("Login failed");
     });
 }
 
@@ -25,16 +26,12 @@ function getClusterInfo() {
   })
     .then((response) => response.json())
     .then((data) => {
-      console.log(JSON.stringify(data, null, 2));
-      document.getElementById("response").textContent = JSON.stringify(
-        data,
-        null,
-        2,
-      );
+      logResponse("Cluster info response", data);
+      updateResponse(JSON.stringify(data, null, 2));
     })
-    .catch(() => {
-      document.getElementById("response").textContent =
-        "Failed to get cluster info";
+    .catch((error) => {
+      logResponse("Cluster info error", error);
+      updateResponse("Failed to get cluster info");
     });
 }
 
@@ -42,12 +39,42 @@ function checkHealth() {
   fetch("/health")
     .then((response) => response.json())
     .then((data) => {
-      console.log(JSON.stringify(data, null, 2));
-      document.getElementById("response").textContent = data;
+      logResponse("Health check response", data);
+      updateResponse(JSON.stringify(data, null, 2));
     })
-    .catch((e) => {
-      console.error(e);
-      document.getElementById("response").textContent =
-        "Server health check failed";
+    .catch((error) => {
+      logResponse("Health check error", error);
+      updateResponse("Server health check failed");
     });
+}
+
+function controlDoodle(action) {
+  const token = localStorage.getItem("jwt");
+  fetch("/doodle-control", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({ action }),
+  })
+    .then((response) => response.json())
+    .then((data) => {
+      logResponse("Doodle control response", data);
+      updateResponse(
+        `Doodle ${action} response: ` + JSON.stringify(data, null, 2),
+      );
+    })
+    .catch((error) => {
+      logResponse("Doodle control error", error);
+      updateResponse(`Failed to ${action} Doodle`);
+    });
+}
+
+function updateResponse(message) {
+  document.getElementById("response").textContent = message;
+}
+
+function logResponse(title, data) {
+  console.log(title + ": " + JSON.stringify(data, null, 2));
 }
