@@ -7,10 +7,13 @@ def load_doodle_config(ini_file_path):
     config = configparser.ConfigParser()
     config.read(ini_file_path)
 
+    print("config file is at:", ini_file_path)
+
+
     gcp_config = {
         'GCP_PROJECT': config.get('gcp', 'GCP_PROJECT'),
         'CLOUDSDK_COMPUTE_ZONE': config.get('gcp', 'CLOUDSDK_COMPUTE_ZONE'),
-        'SERVICE_ACCOUNT_FILE': config.get('gcp', 'SERVICE_ACCOUNT_FILE', fallback='server/service-account-key.json'),
+        #'SERVICE_ACCOUNT_FILE': config.get('gcp', 'SERVICE_ACCOUNT_FILE'),
         'K8S_CLUSTER_NAME': config.get('kubernetes', 'K8S_CLUSTER_NAME'),
         'GPU_TYPE': 'nvidia-tesla-t4',
         'MACHINE_TYPE': 'n1-standard-4',
@@ -25,7 +28,7 @@ def create_gpu_node_pool(config_data):
     project_id = config_data['GCP_PROJECT']
     zone = config_data['CLOUDSDK_COMPUTE_ZONE']
     cluster_name = config_data['K8S_CLUSTER_NAME']
-    service_account_file = config_data['SERVICE_ACCOUNT_FILE']
+    service_account_file = os.path.join(os.path.dirname(__file__), 'service-account-key.json')
     gpu_type = config_data['GPU_TYPE']
     gpu_count = config_data['GPU_COUNT']
     node_pool_name = config_data['NODE_POOL_NAME']
@@ -63,7 +66,7 @@ def delete_gpu_node_pool(config_data):
     zone = config_data['CLOUDSDK_COMPUTE_ZONE']
     cluster_name = config_data['K8S_CLUSTER_NAME']
     node_pool_name = config_data['NODE_POOL_NAME']
-    service_account_file = config_data['SERVICE_ACCOUNT_FILE']
+    service_account_file = os.path.join(os.path.dirname(__file__), 'service-account-key.json')
 
     credentials = service_account.Credentials.from_service_account_file(service_account_file)
     gcp_client = container_v1.ClusterManagerClient(credentials=credentials)

@@ -61,6 +61,7 @@ if [ $NO_SUPERVISOR -eq 0 ]; then
     SUPERVISOR_DIRECTORY="$SCRIPT_DIR/../supervisor"
     SUPERVISOR_IMAGE_NAME=$(full_image_name "osai-kube/supervisor" "latest")
     cp $SCRIPT_DIR/config.ini $SUPERVISOR_DIRECTORY/server/config.ini
+    cp $SERVICE_ACCOUNT_FILE $SUPERVISOR_DIRECTORY/server/service-account-key.json
     build_image "supervisor" $SUPERVISOR_DOCKERFILE "$SUPERVISOR_DIRECTORY" $SUPERVISOR_IMAGE_NAME
 fi
 

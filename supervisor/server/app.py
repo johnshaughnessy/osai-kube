@@ -38,10 +38,10 @@ def doodle_control():
     config_data = gcp_utils.load_doodle_config(config_file)
 
     if action == 'start':
-        kube_utils.update_deployment_replicas('doodle-deployment', 1, 'default-namespace')
+        kube_utils.update_deployment_replicas('doodle-deployment', 1, 'osai-kube')
         gcp_utils.create_gpu_node_pool(config_data)
     elif action == 'stop':
-        kube_utils.update_deployment_replicas('doodle-deployment', 0, 'default-namespace')
+        kube_utils.update_deployment_replicas('doodle-deployment', 0, 'osai-kube')
         gcp_utils.delete_gpu_node_pool(config_data)
     else:
         return jsonify({"msg": "Invalid action"}), 400
