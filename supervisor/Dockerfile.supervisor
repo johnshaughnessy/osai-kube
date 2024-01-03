@@ -11,6 +11,9 @@ RUN mkdir -p server
 COPY server/requirements.txt server/
 RUN pip install --no-cache-dir -r server/requirements.txt
 
+# TODO: Remove vim. Only used for editing.
+RUN apt-get update && apt-get install -y vim
+
 # Copy the current directory contents into the container at /usr/src/app
 COPY . .
 

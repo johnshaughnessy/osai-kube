@@ -4,7 +4,7 @@ metadata:
   name: doodle-deployment
   namespace: osai-kube
 spec:
-  replicas: 0 # Start with 0 replicas
+  replicas: 1
   selector:
     matchLabels:
       app: doodle

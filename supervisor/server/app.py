@@ -34,7 +34,8 @@ def get_cluster_info():
 @jwt_required()
 def doodle_control():
     action = request.json.get('action', None)
-    config_data = gcp_utils.load_doodle_config()
+    config_file = os.path.join(os.path.dirname(__file__), 'config.ini')
+    config_data = gcp_utils.load_doodle_config(config_file)
 
     if action == 'start':
         kube_utils.update_deployment_replicas('doodle-deployment', 1, 'default-namespace')

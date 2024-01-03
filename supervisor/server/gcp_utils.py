@@ -3,7 +3,7 @@ from google.oauth2 import service_account
 import configparser
 import os
 
-def load_doodle_config(ini_file_path='config.ini'):
+def load_doodle_config(ini_file_path):
     config = configparser.ConfigParser()
     config.read(ini_file_path)
 
