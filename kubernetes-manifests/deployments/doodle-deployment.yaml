@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: doodle
-          image: us-central1-docker.pkg.dev/hubs-dev-333333/ocho-osai/browserlab/doodle@sha256:572f6df281c5bcb68b83d3bc0e1fcb2bb56a113c5f314af9b0202827947ff84f
+          image: us-central1-docker.pkg.dev/hubs-dev-333333/ocho-osai/browserlab/doodle@sha256:147ab1a673ea53dd3ae4ae3822eaab362fea5e50c294ff3c661e12ddf891f4e4
           resources:
             limits:
               nvidia.com/gpu: 1 # Assuming usage of NVIDIA GPUs
