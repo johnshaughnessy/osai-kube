@@ -21,6 +21,22 @@ NO_COLOR=0
 SKIP_CONFIG_CHECK=1
 SKIP_KUBERNETES_CHECK=1
 SKIP_ARTIFACT_REGISTRY_CHECK=1
+FLAG_PRINT_USAGE_AND_EXIT=0
+
+print_usage() {
+    echo "
+Usage:
+
+    status.sh [options]
+
+Options:
+    --no-color : Do not print color.
+    --config   : Enable configuration check.
+    --kube     : Enable Kubernetes check.
+    --docker   : Enable artifact registry check.
+    --all      : Enable all checks.
+"
+}
 
 # Parse command line arguments
 for arg in "$@"
@@ -37,35 +53,33 @@ do
         SKIP_CONFIG_CHECK=0
         SKIP_KUBERNETES_CHECK=0
         SKIP_ARTIFACT_REGISTRY_CHECK=0
+    elif [ "$arg" == "--help" ]; then
+        FLAG_PRINT_USAGE_AND_EXIT=1
+    elif [ "$arg" == "help" ]; then
+        FLAG_PRINT_USAGE_AND_EXIT=1
+    elif [ "$arg" == "h" ]; then
+        FLAG_PRINT_USAGE_AND_EXIT=1
     else
-        print_message "Unknown argument: $arg. Accepted arguments:
-    --no-color : Do not print color.
-    --config   : Enable configuration check.
-    --kube     : Enable Kubernetes check.
-    --docker   : Enable artifact registry check.
-    --all      : Enable all checks.
-" "ERROR"
-        exit 1
+        print_message "Unknown argument: $arg" "ERROR"
+        FLAG_PRINT_USAGE_AND_EXIT=1
+        FLAG_ERROR=1
     fi
 done
 
-# If no arguments are provided, print usage and exit.
-if [ $# -eq 0 ]; then
-    print_message "No arguments provided.
-Usage:
-
-    status.sh [options]
-
-Options:
-    --no-color : Do not print color.
-    --config   : Enable configuration check.
-    --kube     : Enable Kubernetes check.
-    --docker   : Enable artifact registry check.
-    --all      : Enable all checks.
-" "ERROR"
-    exit 1
+if [ $FLAG_PRINT_USAGE_AND_EXIT -eq 1 ]; then
+    print_usage
+    if [ $FLAG_ERROR -eq 1 ]; then
+        exit 1
+    fi
+    exit 0
 fi
 
+# If no arguments are provided, print usage and exit.
+if [ $# -eq 0 ]; then
+   SKIP_CONFIG_CHECK=0
+   SKIP_KUBERNETES_CHECK=0
+   SKIP_ARTIFACT_REGISTRY_CHECK=0
+fi
 
 if [ $SKIP_CONFIG_CHECK -eq 0 ]; then
 

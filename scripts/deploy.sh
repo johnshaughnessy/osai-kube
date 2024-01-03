@@ -31,7 +31,10 @@ print_message() {
 }
 
 k8s_apply_config() {
-    output=$(kubectl apply -f $1 2>&1)
+    local config_file="$1"
+
+    # Apply the processed configuration file
+    output=$(kubectl apply -f "$config_file" 2>&1)
     result=$?
 
     filename=$(basename $1)
@@ -60,7 +63,7 @@ update_deployment_image() {
     local image_name="$2"
 
     local image_digest=$(gcloud container images list-tags "$ARTIFACT_REGISTRY/$image_name" --limit=1 --sort-by=~TIMESTAMP --format="json" | jq -r ".[0].digest")
-    local full_image="\$(ARTIFACT_REGISTRY)/${image_name}@${image_digest}"
+    local full_image="$ARTIFACT_REGISTRY/${image_name}@${image_digest}"
 
     # Make a backup of the original file for comparison
     cp "$deployment_file" "${deployment_file}.bak"
@@ -94,7 +97,8 @@ for config in $namespace_configs; do
     k8s_apply_config $config
 done
 
-configs=$(find $CONFIG_DIR -type f -name "*.yaml" ! -path "$CONFIG_DIR/namespaces/*")
+# Ignore namespace and pod configs
+configs=$(find $CONFIG_DIR -type f -name "*.yaml" ! -path "$CONFIG_DIR/namespaces/*" ! -path "$CONFIG_DIR/pods/*")
 for config in $configs; do
     k8s_apply_config $config
 done
