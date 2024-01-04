@@ -1,0 +1,15 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: doodle-ingress
+spec:
+  rules:
+    - http:
+        paths:
+          - path: /doodle
+            pathType: Prefix
+            backend:
+              service:
+                name: doodle-service
+                port:
+                  number: 80

@@ -1,0 +1,15 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: supervisor-ingress
+spec:
+  rules:
+    - http:
+        paths:
+          - path: /supervisor
+            pathType: Prefix
+            backend:
+              service:
+                name: supervisor-service
+                port:
+                  number: 80

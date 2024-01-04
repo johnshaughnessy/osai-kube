@@ -98,7 +98,7 @@ for config in $namespace_configs; do
 done
 
 # Ignore namespace and pod configs
-configs=$(find $MANIFEST_DIR -type f -name "*.yaml" ! -path "$MANIFEST_DIR/namespaces/*" ! -path "$MANIFEST_DIR/pods/*")
+configs=$(find $MANIFEST_DIR -type f -name "*.yaml" ! -path "$MANIFEST_DIR/namespaces/*" ! -path "$MANIFEST_DIR/exclude/*")
 for config in $configs; do
     k8s_apply_config $config
 done
