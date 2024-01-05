@@ -11,4 +11,4 @@ roleRef:
 subjects:
   - kind: ServiceAccount
     name: traefik-account
-    namespace: osai-kube # Using "default" because we did not specify a namespace when creating the ClusterAccount.
+    namespace: osai-kube
