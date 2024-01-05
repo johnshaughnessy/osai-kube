@@ -88,7 +88,7 @@ if [ $SKIP_CONFIG_CHECK -eq 0 ]; then
 
     print_message "Checking configuration." "INFO"
 
-    gcloud auth revoke --all --quiet > /dev/null 2>&1
+    # gcloud auth revoke --all --quiet > /dev/null 2>&1
 
     # Verify that we are logged out of gcloud
     ACTIVE_ACCOUNT=$(gcloud auth list --verbosity="error" --filter=status:ACTIVE --format="value(account)" )

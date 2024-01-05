@@ -22,8 +22,23 @@ spec:
           args:
             - --api.insecure
             - --providers.kubernetesingress
+            - --entrypoints.web.Address=:80
+            - --entrypoints.websecure.Address=:443
+            - --certificatesresolvers.myresolver.acme.tlschallenge
+            - --certificatesresolvers.myresolver.acme.email=jshaughnessy@mozilla.com
+            - --certificatesresolvers.myresolver.acme.storage=/acme/acme.json
           ports:
             - name: web
               containerPort: 80
+            - name: websecure
+              containerPort: 443
             - name: dashboard
               containerPort: 8080
+          volumeMounts:
+            - name: acme-storage
+              mountPath: "/acme"
+              readOnly: false
+      volumes:
+        - name: acme-storage
+          persistentVolumeClaim:
+            claimName: traefik-acme-storage
