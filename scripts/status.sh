@@ -42,8 +42,7 @@ Options:
 }
 
 # Parse command line arguments
-for arg in "$@"
-do
+for arg in "$@"; do
     if [ "$arg" == "--no-color" ]; then
         NO_COLOR=1
     elif [ "$arg" == "--config" ]; then
@@ -79,23 +78,24 @@ fi
 
 # If no arguments are provided, print usage and exit.
 if [ $# -eq 0 ]; then
-   SKIP_CONFIG_CHECK=0
-   SKIP_KUBERNETES_CHECK=0
-   SKIP_ARTIFACT_REGISTRY_CHECK=0
+    SKIP_CONFIG_CHECK=0
+    SKIP_KUBERNETES_CHECK=0
+    SKIP_ARTIFACT_REGISTRY_CHECK=0
 fi
 
 if [ $SKIP_CONFIG_CHECK -eq 0 ]; then
 
     print_message "Checking configuration." "INFO"
 
+    # Log out of gcloud
     # gcloud auth revoke --all --quiet > /dev/null 2>&1
-
+    #
     # Verify that we are logged out of gcloud
-    ACTIVE_ACCOUNT=$(gcloud auth list --verbosity="error" --filter=status:ACTIVE --format="value(account)" )
-    if [ -n "$ACTIVE_ACCOUNT" ]; then
-        print_message "Failed to log out of gcloud." "ERROR"
-        exit 1
-    fi
+    # ACTIVE_ACCOUNT=$(gcloud auth list --verbosity="error" --filter=status:ACTIVE --format="value(account)" )
+    # if [ -n "$ACTIVE_ACCOUNT" ]; then
+    #     print_message "Failed to log out of gcloud." "ERROR"
+    #     exit 1
+    # fi
 
     # Verify the $SERVICE_ACCOUNT_FILE exists
     if [ ! -f "$SERVICE_ACCOUNT_FILE" ]; then
@@ -106,7 +106,7 @@ if [ $SKIP_CONFIG_CHECK -eq 0 ]; then
     fi
 
     # Try a GKE operation that requires Kubernetes Engine Admin role
-    gcloud auth activate-service-account --key-file=$SERVICE_ACCOUNT_FILE > /dev/null 2>&1
+    gcloud auth activate-service-account --key-file=$SERVICE_ACCOUNT_FILE >/dev/null 2>&1
 
     ACTIVE_ACCOUNT=$(gcloud auth list --verbosity="error" --filter=status:ACTIVE --format="value(account)")
     if [ ! -n "$ACTIVE_ACCOUNT" ]; then
@@ -125,7 +125,7 @@ if [ $SKIP_CONFIG_CHECK -eq 0 ]; then
     fi
 
     # Verify that the GCP_PROJECT exists
-    gcloud projects describe "$GCP_PROJECT" > /dev/null 2>&1
+    gcloud projects describe "$GCP_PROJECT" >/dev/null 2>&1
     if [ $? -ne 0 ]; then
         print_message "GCP project $GCP_PROJECT does not exist." "ERROR"
         exit 1
@@ -143,7 +143,7 @@ if [ $SKIP_CONFIG_CHECK -eq 0 ]; then
     fi
 
     # Verify that we can access the artifact registry via gcloud
-    gcloud auth print-access-token > /dev/null 2>&1
+    gcloud auth print-access-token >/dev/null 2>&1
     if [ $? -ne 0 ]; then
         print_message "Could not access artifact registry. Please run 'gcloud auth login' and try again." "ERROR"
         exit 1
@@ -162,40 +162,10 @@ if [ $SKIP_KUBERNETES_CHECK -eq 0 ]; then
     gcloud container node-pools list --cluster="$K8S_CLUSTER_NAME"
 
     echo
-    print_message "Listing nodes" "INFO"
+    print_message "kubectl get nodes,pods,deployments,services" "INFO"
     echo
 
-    kubectl get nodes
-
-    echo
-    print_message "Listing pods in osai-kube" "INFO"
-    echo
-
-    kubectl get pods --namespace osai-kube
-
-    echo
-    print_message "Listing pods in kube-system" "INFO"
-    echo
-
-    kubectl get pods --namespace kube-system --context "$K8S_CONTEXT_NAME"
-
-    echo
-    print_message "Listing deployments in osai-kube" "INFO"
-    echo
-
-    kubectl get deployments --namespace osai-kube
-
-    echo
-    print_message "Listing services in osai-kube" "INFO"
-    echo
-
-    kubectl get services --namespace osai-kube
-
-    echo
-    print_message "Listing config maps in osai-kube" "INFO"
-    echo
-
-    kubectl get configmaps --namespace osai-kube
+    kubectl get nodes,pods,deployments,services
 
     echo
 
@@ -227,10 +197,10 @@ if [ $SKIP_ARTIFACT_REGISTRY_CHECK -eq 0 ]; then
     print_message "Checking artifact registry." "INFO"
 
     # Activate the service account
-    gcloud auth activate-service-account --key-file=$SERVICE_ACCOUNT_FILE > /dev/null 2>&1
+    gcloud auth activate-service-account --key-file=$SERVICE_ACCOUNT_FILE >/dev/null 2>&1
 
     # Configure Docker to use gcloud as a credential helper
-    gcloud auth configure-docker --quiet --verbosity="error" > /dev/null 2>&1
+    gcloud auth configure-docker --quiet --verbosity="error" >/dev/null 2>&1
 
     # Initialize an array to store the image information
     declare -a image_info_list
