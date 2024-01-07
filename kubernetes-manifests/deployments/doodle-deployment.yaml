@@ -18,6 +18,6 @@ spec:
           image: us-central1-docker.pkg.dev/hubs-dev-333333/ocho-osai/browserlab/doodle@sha256:147ab1a673ea53dd3ae4ae3822eaab362fea5e50c294ff3c661e12ddf891f4e4
           resources:
             limits:
-              nvidia.com/gpu: 1 # Assuming usage of NVIDIA GPUs
+              nvidia.com/gpu: 1
       nodeSelector:
-        pool: doodle # Ensure this matches the label given to the nodes in the doodle node pool
+        pool: doodle

@@ -1,15 +1,16 @@
-apiVersion: networking.k8s.io/v1
-kind: Ingress
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
 metadata:
-  name: doodle-ingress
+  name: doodle-ingress-https
+  namespace: osai-kube
 spec:
-  rules:
-    - http:
-        paths:
-          - path: /doodle
-            pathType: Prefix
-            backend:
-              service:
-                name: doodle-service
-                port:
-                  number: 80
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`doodle.moz8.net`)
+      kind: Rule
+      services:
+        - name: doodle-service
+          port: 80
+  tls:
+    certResolver: myresolver

@@ -5,7 +5,6 @@ metadata:
   namespace: osai-kube
 spec:
   entryPoints:
-    - web
     - websecure
   routes:
     - match: Host(`supervisor.moz8.net`)

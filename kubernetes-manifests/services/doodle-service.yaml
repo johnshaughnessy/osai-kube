@@ -8,5 +8,5 @@ spec:
     app: doodle
   ports:
     - protocol: TCP
-      port: 80 # Replace with the port your app uses, if different
-      targetPort: 8001 # Replace with the container's port
+      port: 80
+      targetPort: 8001
