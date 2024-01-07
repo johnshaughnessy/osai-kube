@@ -17,7 +17,11 @@ spec:
       containers:
         - name: keycloak
           image: quay.io/keycloak/keycloak:23.0.3
-          args: ["start-dev"]
+          args:
+            - "start"
+            - "--hostname=keycloak.moz8.net"
+            - "--proxy=edge"
+
           env:
             - name: DB_VENDOR
               value: POSTGRES
@@ -36,6 +40,10 @@ spec:
               value: "admin"
             - name: KEYCLOAK_ADMIN_PASSWORD
               value: "admin"
+            - name: PROXY_ADDRESS_FORWARDING
+              value: "true"
+            - name: KC_HTTPS_PORT
+              value: "443"
             - name: KC_PROXY
               value: "passthrough"
           ports:
