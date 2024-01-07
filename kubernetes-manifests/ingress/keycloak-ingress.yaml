@@ -1,0 +1,18 @@
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: keycloak-ingress
+  namespace: osai-kube
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`keycloak.moz8.net`)
+      kind: Rule
+      services:
+        - name: keycloak
+          port: 8080
+      middlewares:
+        - name: headers-forwarding
+  tls:
+    certResolver: myresolver
