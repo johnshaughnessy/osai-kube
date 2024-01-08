@@ -7,6 +7,11 @@ spec:
   selector:
     app: doodle
   ports:
-    - protocol: TCP
+    - name: web
+      protocol: TCP
       port: 80
       targetPort: 8001
+    - name: gatekeeper
+      protocol: TCP
+      port: 3000
+      targetPort: 3000
