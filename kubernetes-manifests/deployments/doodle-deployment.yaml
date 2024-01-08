@@ -4,6 +4,8 @@ metadata:
   name: doodle-deployment
   namespace: osai-kube
 spec:
+  strategy:
+    type: Recreate
   replicas: 1
   selector:
     matchLabels:
