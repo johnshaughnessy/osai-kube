@@ -11,6 +11,6 @@ spec:
       kind: Rule
       services:
         - name: doodle-service
-          port: 3000 # Updated to Gatekeeper's port
+          port: 3000 # Gatekeeper
   tls:
     certResolver: myresolver

@@ -20,19 +20,19 @@ spec:
             limits:
               nvidia.com/gpu: 1
           ports:
-            - containerPort: 8001 # Ensure this matches your application's port
+            - containerPort: 8001
         - name: gatekeeper
-          image: quay.io/keycloak/keycloak-gatekeeper # Use the latest stable image
+          image: quay.io/keycloak/keycloak-gatekeeper
           args:
             - --config=/etc/gatekeeper/config.yaml
           volumeMounts:
             - name: gatekeeper-config
               mountPath: /etc/gatekeeper
           ports:
-            - containerPort: 3000 # Gatekeeper port
+            - containerPort: 3000
       volumes:
         - name: gatekeeper-config
-          configMap:
-            name: gatekeeper-doodle-config
+          secret:
+            secretName: gatekeeper-doodle-secret
       nodeSelector:
         pool: doodle
