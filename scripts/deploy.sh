@@ -59,17 +59,21 @@ k8s_apply_config() {
 
 update_deployment_image() {
     local deployment_file="$1"
-    local filename_with_parent=$(echo $deployment_file | sed "s|$MANIFEST_DIR/||g")
-    local image_name="$2"
+    local container_name="$2"
+    local image_name="$3"
 
     local image_digest=$(gcloud container images list-tags "$ARTIFACT_REGISTRY/$image_name" --limit=1 --sort-by=~TIMESTAMP --format="json" | jq -r ".[0].digest")
+
     local full_image="$ARTIFACT_REGISTRY/${image_name}@${image_digest}"
+
+    local filename=$(basename $1)
+    local filename_with_parent=$(echo $1 | sed "s|$MANIFEST_DIR/||g")
 
     # Make a backup of the original file for comparison
     cp "$deployment_file" "${deployment_file}.bak"
 
     # Update the deployment YAML file
-    sed -i "s|image: .*|image: $full_image|" "$deployment_file"
+    sed -i "/name: $container_name/,/image:/s|image: .*|image: $full_image|" "$deployment_file"
 
     # Check if the file was changed
     if cmp -s "${deployment_file}.bak" "$deployment_file"; then
@@ -84,11 +88,13 @@ update_deployment_image() {
 
 SUPERVISOR_DEPLOYMENT_FILE="$MANIFEST_DIR/deployments/supervisor-deployment.yaml"
 SUPERVISOR_IMAGE_NAME="osai-kube/supervisor"
-update_deployment_image "$SUPERVISOR_DEPLOYMENT_FILE" "$SUPERVISOR_IMAGE_NAME"
+SUPERVISOR_CONTAINER_NAME="supervisor"
+update_deployment_image "$SUPERVISOR_DEPLOYMENT_FILE" "$SUPERVISOR_CONTAINER_NAME" "$SUPERVISOR_IMAGE_NAME"
 
 DOODLE_DEPLOYMENT_FILE="$MANIFEST_DIR/deployments/doodle-deployment.yaml"
 DOODLE_IMAGE_NAME="browserlab/doodle"
-update_deployment_image "$DOODLE_DEPLOYMENT_FILE" "$DOODLE_IMAGE_NAME"
+DOODLE_CONTAINER_NAME="doodle"
+update_deployment_image "$DOODLE_DEPLOYMENT_FILE" "$DOODLE_CONTAINER_NAME" "$DOODLE_IMAGE_NAME"
 
 # Apply namespace configs first
 print_message "Applying namespace configurations..." "INFO"
@@ -113,7 +119,8 @@ done
 
 # Apply Secrets
 print_message "Applying Secrets..." "INFO"
-secret_configs=$(find $MANIFEST_DIR/secrets -type f -name "*.yaml")
+secret_configs=$(find $MANIFEST_DIR/secrets -type f -name "*.yaml" ! -name "gatekeeper-doodle-config.yaml")
+
 for config in $secret_configs; do
     k8s_apply_config $config
 done

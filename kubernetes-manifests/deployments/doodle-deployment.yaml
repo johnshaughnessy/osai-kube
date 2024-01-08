@@ -25,13 +25,14 @@ spec:
           image: quay.io/keycloak/keycloak-gatekeeper
           args:
             - --config=/etc/gatekeeper/config.yaml
+            - --listen=0.0.0.0:3000
           volumeMounts:
-            - name: gatekeeper-config
+            - name: gatekeeper-doodle-config
               mountPath: /etc/gatekeeper
           ports:
             - containerPort: 3000
       volumes:
-        - name: gatekeeper-config
+        - name: gatekeeper-doodle-config
           secret:
             secretName: gatekeeper-doodle-secret
       nodeSelector:
