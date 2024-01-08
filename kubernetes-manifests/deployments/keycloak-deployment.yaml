@@ -4,6 +4,7 @@ metadata:
   name: keycloak
   labels:
     app: keycloak
+  namespace: osai-kube
 spec:
   replicas: 1
   selector:
@@ -19,18 +20,21 @@ spec:
           image: quay.io/keycloak/keycloak:23.0.3
           args:
             - "start"
+            - "--db=postgres"
+            - "--db-url=jdbc:postgresql://postgresql.osai-kube.svc.cluster.local/keycloak"
+            - "--db-username=keycloak"
+            - "--db-password=${DB_PASSWORD}"
             - "--hostname=keycloak.moz8.net"
             - "--proxy=edge"
-
           env:
             - name: DB_VENDOR
-              value: POSTGRES
+              value: "postgres"
             - name: DB_ADDR
-              value: postgresql.osai-kube.svc.cluster.local
+              value: "postgresql.osai-kube.svc.cluster.local"
             - name: DB_DATABASE
-              value: keycloak
+              value: "keycloak"
             - name: DB_USER
-              value: keycloak
+              value: "keycloak"
             - name: DB_PASSWORD
               valueFrom:
                 secretKeyRef:

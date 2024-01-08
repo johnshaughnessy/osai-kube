@@ -17,3 +17,6 @@ data:
     local   replication     all                                     scram-sha-256
     host    replication     all             127.0.0.1/32            scram-sha-256
     host    replication     all             ::1/128                 scram-sha-256
+    # Allow connections from within the cluster
+    # In GCP, this value is labeled "Cluster Pod IPv4 range (default)"
+    host    all             all             10.80.0.0/14            scram-sha-256

@@ -1,0 +1,7 @@
+client-id: # Your Keycloak Client ID for the Doodle app
+client-secret: # Client Secret from Keycloak
+discovery-url: # Replace with your Keycloak URL and realm
+enable-refresh-tokens: true
+upstream-url: "http://doodle-service" # Internal service URL of your Doodle application
+redirection-url: # Public URL of your Doodle app
+secure-cookie: true # Set to true if using HTTPS
