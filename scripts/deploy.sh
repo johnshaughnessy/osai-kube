@@ -26,7 +26,7 @@ print_message() {
         [ "$NO_COLOR" == "1" ] && echo "[osai-kube] [$2] $1" || echo -e "[osai-kube] [\033[0;32m$2\033[0m] $1"
     else
         # No color for other messages
-        echo "[osai-kube] [$2] $1"
+        echo "[osai-kube] [$2]       $1"
     fi
 }
 
@@ -82,7 +82,6 @@ update_deployment_image() {
     rm "${deployment_file}.bak"
 }
 
-
 SUPERVISOR_DEPLOYMENT_FILE="$MANIFEST_DIR/deployments/supervisor-deployment.yaml"
 SUPERVISOR_IMAGE_NAME="osai-kube/supervisor"
 update_deployment_image "$SUPERVISOR_DEPLOYMENT_FILE" "$SUPERVISOR_IMAGE_NAME"
@@ -92,14 +91,94 @@ DOODLE_IMAGE_NAME="browserlab/doodle"
 update_deployment_image "$DOODLE_DEPLOYMENT_FILE" "$DOODLE_IMAGE_NAME"
 
 # Apply namespace configs first
+print_message "Applying namespace configurations..." "INFO"
 namespace_configs=$(find $MANIFEST_DIR/namespaces -type f -name "*.yaml")
 for config in $namespace_configs; do
     k8s_apply_config $config
 done
 
-# Ignore namespace and pod configs
-configs=$(find $MANIFEST_DIR -type f -name "*.yaml" ! -path "$MANIFEST_DIR/namespaces/*" ! -path "$MANIFEST_DIR/exclude/*")
-for config in $configs; do
+# Apply CRDs next
+print_message "Applying CRDs..." "INFO"
+crd_configs=$(find $MANIFEST_DIR/crds -type f -name "*.yaml")
+for config in $crd_configs; do
     k8s_apply_config $config
 done
 
+# Apply ConfigMaps
+print_message "Applying ConfigMaps..." "INFO"
+config_map_configs=$(find $MANIFEST_DIR/config-maps -type f -name "*.yaml")
+for config in $config_map_configs; do
+    k8s_apply_config $config
+done
+
+# Apply Secrets
+print_message "Applying Secrets..." "INFO"
+secret_configs=$(find $MANIFEST_DIR/secrets -type f -name "*.yaml")
+for config in $secret_configs; do
+    k8s_apply_config $config
+done
+
+# Apply RBAC roles and role bindings
+print_message "Applying RBAC configurations..." "INFO"
+rbac_configs=$(find $MANIFEST_DIR/roles -type f -name "*.yaml")
+for config in $rbac_configs; do
+    k8s_apply_config $config
+done
+
+# Apply Service Accounts
+print_message "Applying Service Accounts..." "INFO"
+service_account_configs=$(find $MANIFEST_DIR/service-accounts -type f -name "*.yaml")
+for config in $service_account_configs; do
+    k8s_apply_config $config
+done
+
+# Apply Storage: PVCs
+print_message "Applying Persistent Volume Claims..." "INFO"
+pvc_configs=$(find $MANIFEST_DIR/pvcs -type f -name "*.yaml")
+for config in $pvc_configs; do
+    k8s_apply_config $config
+done
+
+# Apply Middleware configurations
+print_message "Applying Middleware configurations..." "INFO"
+middleware_configs=$(find $MANIFEST_DIR/middleware -type f -name "*.yaml")
+for config in $middleware_configs; do
+    k8s_apply_config $config
+done
+
+# Apply Services
+print_message "Applying Service configurations..." "INFO"
+service_configs=$(find $MANIFEST_DIR/services -type f -name "*.yaml")
+for config in $service_configs; do
+    k8s_apply_config $config
+done
+
+# Apply StatefulSets
+print_message "Applying StatefulSets..." "INFO"
+stateful_set_configs=$(find $MANIFEST_DIR/stateful-sets -type f -name "*.yaml")
+for config in $stateful_set_configs; do
+    k8s_apply_config $config
+done
+
+# Apply Deployments
+print_message "Applying Deployments..." "INFO"
+deployment_configs=$(find $MANIFEST_DIR/deployments -type f -name "*.yaml")
+for config in $deployment_configs; do
+    k8s_apply_config $config
+done
+
+# Apply DaemonSets
+print_message "Applying DaemonSets..." "INFO"
+daemonset_configs=$(find $MANIFEST_DIR/daemonsets -type f -name "*.yaml")
+for config in $daemonset_configs; do
+    k8s_apply_config $config
+done
+
+# Apply Ingress configurations last
+print_message "Applying Ingress configurations..." "INFO"
+ingress_configs=$(find $MANIFEST_DIR/ingress -type f -name "*.yaml")
+for config in $ingress_configs; do
+    k8s_apply_config $config
+done
+
+print_message "All configurations have been applied." "INFO"
