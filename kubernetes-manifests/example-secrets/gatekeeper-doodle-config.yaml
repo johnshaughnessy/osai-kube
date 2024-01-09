@@ -5,3 +5,4 @@ enable-refresh-tokens: true
 upstream-url: "http://doodle-service" # Internal service URL of your Doodle application
 redirection-url: # Public URL of your Doodle app
 secure-cookie: true # Set to true if using HTTPS
+encryption-key: # base64 encoded encryption key for gatekeeper. Generate this with: openssl rand -base64 24
