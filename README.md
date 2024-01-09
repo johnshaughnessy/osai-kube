@@ -4,6 +4,8 @@ Run open source AI apps in an auto-scaling Kubernetes cluster.
 
 # About
 
+[This blog post](https://www.johnshaughnessy.com/blog/posts/osai-kube) describes the motivation for this project. Here is a brief summary of the features, capabilities, and intended use:
+
 - Configure and run applications with various GPU requirements.
 - Auto-scale GPU nodes in app-specific node pools.
 - User account authentication and authorization powered by [`keycloak`](https://github.com/keycloak/keycloak) and [`keycloak-gatekeeper`](https://github.com/oneconcern/keycloak-gatekeeper), including support for OpenID Connect, SAML, SSO, etc.
