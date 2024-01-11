@@ -120,6 +120,7 @@ done
 # Apply Secrets
 print_message "Applying Secrets..." "INFO"
 $SCRIPT_DIR/write-gatekeeper-doodle-secret.sh
+print_message "Rewrote gatekeeper-doodle-secret.yaml. (Not necessarily changed.)" "INFO"
 secret_configs=$(find $MANIFEST_DIR/secrets -type f -name "*.yaml" ! -name "gatekeeper-doodle-config.yaml")
 
 for config in $secret_configs; do

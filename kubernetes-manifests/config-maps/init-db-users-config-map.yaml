@@ -1,0 +1,36 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: init-db-users-config-map
+  namespace: osai-kube
+data:
+  init-db-users.sh: |
+    #!/bin/bash
+    set -e
+
+    # Function to create user and database
+    create_user_and_db() {
+        local user=$1
+        local pass=$2
+        local dbname=$3
+
+        echo "Creating user $user and database $dbname..."
+
+        local sql_command
+        sql_command+="CREATE ROLE \"$user\" WITH LOGIN PASSWORD '$pass'; "
+        sql_command+="CREATE DATABASE \"$dbname\"; "
+        sql_command+="GRANT ALL PRIVILEGES ON DATABASE \"$dbname\" TO \"$user\";"
+
+        echo "$sql_command" | psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER"
+    }
+
+    KEYCLOAK_USER=$(cat /etc/secrets/keycloak/username)
+    KEYCLOAK_PASS=$(cat /etc/secrets/keycloak/password)
+    STORAGE_GATEWAY_USER=$(cat /etc/secrets/storage-gateway/username)
+    STORAGE_GATEWAY_PASS=$(cat /etc/secrets/storage-gateway/password)
+
+    # Create Keycloak user and database
+    create_user_and_db $KEYCLOAK_USER $KEYCLOAK_PASS "keycloak"
+
+    # Create Storage Gateway user and database
+    create_user_and_db $STORAGE_GATEWAY_USER $STORAGE_GATEWAY_PASS "storage_gateway"

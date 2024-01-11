@@ -14,44 +14,83 @@ spec:
       labels:
         app: postgresql
     spec:
-      initContainers:
-        - name: init-db-config
-          image: busybox
-          command:
-            [
-              "sh",
-              "-c",
-              "cp /postgres-config/pg_hba.conf /postgresql-storage/pgdata/pg_hba.conf",
-            ]
-          volumeMounts:
-            - name: postgres-config-volume
-              mountPath: /postgres-config
-            - name: postgresql-storage
-              mountPath: /postgresql-storage
       containers:
         - name: postgresql
           image: postgres:latest
           ports:
             - containerPort: 5432
+
           env:
             - name: PGDATA
               value: /var/lib/postgresql/data/pgdata
-            - name: POSTGRES_DB
-              value: keycloak
             - name: POSTGRES_USER
-              value: keycloak
+              valueFrom:
+                secretKeyRef:
+                  name: postgresql-admin-secret
+                  key: username
             - name: POSTGRES_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: postgresql-secret
+                  name: postgresql-admin-secret
                   key: password
+            - name: PGPASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgresql-admin-secret
+                  key: password
+
           volumeMounts:
+            - name: init-db-users-script
+              mountPath: /docker-entrypoint-initdb.d/init-db-users.sh
+              subPath: init-db-users.sh
+            - name: pg-keycloak-secret
+              mountPath: /etc/secrets/keycloak
+            - name: pg-storage-gateway-secret
+              mountPath: /etc/secrets/storage-gateway
+            - name: postgresql-storage
+              mountPath: /var/lib/postgresql/data
+        - name: pg-hba-sidecar
+          image: busybox
+          command: ["/bin/sh", "-c"]
+          args:
+            - |
+              # Wait for PostgreSQL to start listening on port 5432
+              echo "Waiting for PostgreSQL to be ready..."
+              while ! nc -z localhost 5432; do
+                echo "PostgreSQL not ready. Retrying in 10 seconds..."
+                sleep 10
+              done
+              echo "PostgreSQL is ready. Proceeding to copy pg_hba.conf."
+
+              # Copy pg_hba.conf file
+              if cp /etc/postgresql/pg-hba-config/pg_hba.conf /var/lib/postgresql/data/pgdata/pg_hba.conf; then
+                echo "pg_hba.conf copied successfully."
+              else
+                echo "Failed to copy pg_hba.conf."
+                exit 1
+              fi
+
+              # Sleep indefinitely after the copy attempt
+              sleep infinity
+
+          volumeMounts:
+            - name: pg-hba-volume
+              mountPath: /etc/postgresql/pg-hba-config
             - name: postgresql-storage
               mountPath: /var/lib/postgresql/data
       volumes:
-        - name: postgres-config-volume
+        - name: pg-hba-volume
           configMap:
-            name: postgres-config
+            name: pg-hba-config-map
+        - name: init-db-users-script
+          configMap:
+            name: init-db-users-config-map
+        - name: pg-keycloak-secret
+          secret:
+            secretName: postgresql-keycloak-secret
+        - name: pg-storage-gateway-secret
+          secret:
+            secretName: postgresql-storage-gateway-secret
   volumeClaimTemplates:
     - metadata:
         name: postgresql-storage
