@@ -8,20 +8,25 @@ data:
     #!/bin/bash
     set -e
 
-    # Function to create user and database
+    # Function to create user and database with permissions on schema public
     create_user_and_db() {
         local user=$1
         local pass=$2
         local dbname=$3
 
-        echo "Creating user $user and database $dbname..."
+        echo "Creating user $user, database $dbname, and granting permissions..."
 
-        local sql_command
-        sql_command+="CREATE ROLE \"$user\" WITH LOGIN PASSWORD '$pass'; "
-        sql_command+="CREATE DATABASE \"$dbname\"; "
-        sql_command+="GRANT ALL PRIVILEGES ON DATABASE \"$dbname\" TO \"$user\";"
+        # Create user and database
+        local create_db_sql
+        create_db_sql+="CREATE ROLE \"$user\" WITH LOGIN PASSWORD '$pass'; "
+        create_db_sql+="CREATE DATABASE \"$dbname\"; "
+        create_db_sql+="GRANT ALL PRIVILEGES ON DATABASE \"$dbname\" TO \"$user\";"
+        echo "$create_db_sql" | psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER"
 
-        echo "$sql_command" | psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER"
+        # Grant permissions in the newly created database
+        local grant_perms_sql
+        grant_perms_sql+="GRANT ALL PRIVILEGES ON SCHEMA public TO keycloak;"
+        echo "$grant_perms_sql" | psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" -d "$dbname"
     }
 
     KEYCLOAK_USER=$(cat /etc/secrets/keycloak/username)
