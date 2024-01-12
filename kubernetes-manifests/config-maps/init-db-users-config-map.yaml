@@ -25,7 +25,7 @@ data:
 
         # Grant permissions in the newly created database
         local grant_perms_sql
-        grant_perms_sql+="GRANT ALL PRIVILEGES ON SCHEMA public TO keycloak;"
+        grant_perms_sql+="GRANT ALL PRIVILEGES ON SCHEMA public TO \"$user\";"
         echo "$grant_perms_sql" | psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" -d "$dbname"
     }
 
