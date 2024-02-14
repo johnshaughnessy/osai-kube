@@ -1,1 +1,2 @@
-scripts/config.ini
+etc/live/*
+!etc/live/.gitkeep

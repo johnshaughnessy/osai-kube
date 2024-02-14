@@ -30,3 +30,5 @@ You'll need a GCP project with GKE, Object Storage, Artifact Registry.
 Copy `./scripts/example-config.ini` to `./scripts/config.ini` and configure.
 
 Copy `./kubernetes-manifests/examples-secrets/*` to `./kubernetes-manifests/secrets/` and configure each secret. Secrets must be base64 encoded. Some helpers are available in `./scripts` (e.g. `./scripts/write-gatekeeper-doodle-secret.sh`).
+
+A step-by-step log of what I did to set things up on a fresh GCP project is in `./log/up-and-running.md`. A word of caution: As the project changes, this document will _not_ be updated.
