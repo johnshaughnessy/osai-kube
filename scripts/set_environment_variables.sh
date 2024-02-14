@@ -8,7 +8,8 @@
 #
 
 SCRIPT_DIR="$(dirname "$0")"
-CONFIG_FILE="$SCRIPT_DIR/config.ini"
+ETC_DIR="$SCRIPT_DIR/../etc"
+CONFIG_FILE="$ETC_DIR/live/config.ini"
 
 set_config_vars() {
     while IFS=' = ' read -r key value
