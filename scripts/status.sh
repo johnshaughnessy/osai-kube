@@ -106,7 +106,7 @@ if [ $SKIP_CONFIG_CHECK -eq 0 ]; then
     fi
 
     # Try a GKE operation that requires Kubernetes Engine Admin role
-    gcloud auth activate-service-account --key-file=$SERVICE_ACCOUNT_FILE >/dev/null 2>&1
+    gcloud auth activate-service-account --key-file=$service_account_file >/dev/null 2>&1
 
     ACTIVE_ACCOUNT=$(gcloud auth list --verbosity="error" --filter=status:ACTIVE --format="value(account)")
     if [ ! -n "$ACTIVE_ACCOUNT" ]; then
@@ -149,6 +149,7 @@ if [ $SKIP_CONFIG_CHECK -eq 0 ]; then
     fi
 
     # Verify that we can access the artifact registry via gcloud
+    gcloud auth configure-docker $ARTIFACT_REGISTRY_PREFIX >/dev/null 2>&1
     gcloud auth print-access-token >/dev/null 2>&1
     if [ $? -ne 0 ]; then
         print_message "Could not access artifact registry. Please run 'gcloud auth login' and try again." "ERROR"

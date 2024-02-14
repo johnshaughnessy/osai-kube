@@ -15,4 +15,4 @@ data:
   config.yaml: $config_encoded
 EOF
 
-# echo "Secret manifest created: $MANIFEST_DIR/secrets/gatekeeper-doodle-secret.yaml"
+echo "Secret manifest created: $MANIFEST_DIR/secrets/gatekeeper-doodle-secret.yaml"

@@ -20,13 +20,15 @@ full_image_name(){
     echo "${ARTIFACT_REGISTRY}/${1}:${2}"
 }
 
-gcloud auth configure-docker --quiet --verbosity="error" > /dev/null 2>&1
+gcloud auth activate-service-account --quiet --key-file=$SERVICE_ACCOUNT_FILE >/dev/null 2>&1
+gcloud auth configure-docker --quiet $ARTIFACT_REGISTRY_PREFIX >/dev/null 2>&1
 
 push_to_artifact_registry(){
     IMAGE_NAME=$1
     SHORT_IMAGE_NAME=$2
     print_message "Uploading $SHORT_IMAGE_NAME image to artifact registry." "INFO"
-    docker push --quiet $IMAGE_NAME > /dev/null 2>&1
+    #docker push --quiet $IMAGE_NAME > /dev/null 2>&1
+    docker push $IMAGE_NAME
     if [ $? -ne 0 ]; then
         print_message "Failed to upload $SHORT_IMAGE_NAME image to artifact registry." "ERROR"
         exit 1

@@ -69,4 +69,79 @@ service/kubernetes   ClusterIP   10.8.0.1     <none>        443/TCP   34m
 IMAGE  TAG  DIGEST  TIMESTAMP
 ```
 
+I installed docker build kit.
+
+```
+trizen -S docker-buildx
+```
+
+I ran `./scripts/docker_build_images.sh`
+
+```sh
+➜ ./scripts/build_docker_images.sh
+[osai-kube] [INFO]  Building the supervisor image.
+[+] Building 19.9s (14/14) FINISHED                                                                                      docker:default
+ => [internal] load build definition from Dockerfile.supervisor                                                                    0.0s
+ => => transferring dockerfile: 718B                                                                                               0.0s
+ => [internal] load metadata for docker.io/library/python:3.9-slim                                                                 0.7s
+ => [auth] library/python:pull token for registry-1.docker.io                                                                      0.0s
+ => [internal] load .dockerignore                                                                                                  0.0s
+ => => transferring context: 2B                                                                                                    0.0s
+ => [1/8] FROM docker.io/library/python:3.9-slim@sha256:e0bc011bb55918109921b913fe30160cb8297c570621a450477d44999a792beb           3.7s
+ => => resolve docker.io/library/python:3.9-slim@sha256:e0bc011bb55918109921b913fe30160cb8297c570621a450477d44999a792beb           0.0s
+ => => sha256:9c14a9ca10408336092a7089469ef9a84f3caf196f7f65c512677e1f06e5d839 6.92kB / 6.92kB                                     0.0s
+ => => sha256:e1caac4eb9d2ec24aa3618e5992208321a92492aef5fef5eb9e470895f771c56 29.12MB / 29.12MB                                   0.9s
+ => => sha256:51d1f07906b71fd60ac43c61035514996a8ad8dbfd39d4f570ac5446b064ee5d 3.51MB / 3.51MB                                     0.4s
+ => => sha256:336c7f590cb97722bfee12f22e354df879feae9f28bfd5cebeaffccb3fb8fbf5 11.89MB / 11.89MB                                   0.6s
+ => => sha256:e0bc011bb55918109921b913fe30160cb8297c570621a450477d44999a792beb 1.86kB / 1.86kB                                     0.0s
+ => => sha256:51c781cd11dd1f2a95e2bef833a5920042743fa502d66c9e12c1a841d983f9a7 1.37kB / 1.37kB                                     0.0s
+ => => sha256:93b25b5c998e137849343851763bbc686f369399894e766c37a55304b1f66cfb 244B / 244B                                         0.5s
+ => => sha256:2b527dfdb0a9ecb9a5bf5c264aeb4ac254e0752886f187095f6960b933aab941 3.13MB / 3.13MB                                     0.6s
+ => => extracting sha256:e1caac4eb9d2ec24aa3618e5992208321a92492aef5fef5eb9e470895f771c56                                          1.6s
+ => => extracting sha256:51d1f07906b71fd60ac43c61035514996a8ad8dbfd39d4f570ac5446b064ee5d                                          0.2s
+ => => extracting sha256:336c7f590cb97722bfee12f22e354df879feae9f28bfd5cebeaffccb3fb8fbf5                                          0.6s
+ => => extracting sha256:93b25b5c998e137849343851763bbc686f369399894e766c37a55304b1f66cfb                                          0.0s
+ => => extracting sha256:2b527dfdb0a9ecb9a5bf5c264aeb4ac254e0752886f187095f6960b933aab941                                          0.3s
+ => [internal] load build context                                                                                                  0.0s
+ => => transferring context: 15.21kB                                                                                               0.0s
+ => [2/8] WORKDIR /usr/src/app                                                                                                     0.0s
+ => [3/8] RUN pip install --upgrade pip                                                                                            2.6s
+ => [4/8] RUN mkdir -p server                                                                                                      0.4s
+ => [5/8] COPY server/requirements.txt server/                                                                                     0.0s
+ => [6/8] RUN pip install --no-cache-dir -r server/requirements.txt                                                                7.5s
+ => [7/8] RUN apt-get update && apt-get install -y vim                                                                             4.3s
+ => [8/8] COPY . .                                                                                                                 0.1s
+ => exporting to image                                                                                                             0.5s
+ => => exporting layers                                                                                                            0.5s
+ => => writing image sha256:07d0d798dbac0a4007268ac289e4d8bfd496bf374fbf8aa388bc019711444121                                       0.0s
+ => => naming to us-central1-docker.pkg.dev/moz-fx-dev-jshaughnessy-osai1/af-1/osai-kube/supervisor:latest                         0.0s
+[osai-kube] [OK]    Successfully built the supervisor image.
+```
+
+I ran `./scripts/push_docker_images.sh`
+
+```sh
+17:08:39 in ~/src/osai-kube on  main
+➜ ./scripts/push_docker_images.sh
+Activated service account credentials for: [osai-kube-1@moz-fx-dev-jshaughnessy-osai1.iam.gserviceaccount.com]
+[osai-kube] [INFO]   Uploading supervisor image to artifact registry.
+The push refers to repository [us-central1-docker.pkg.dev/moz-fx-dev-jshaughnessy-osai1/af-1/osai-kube/supervisor]
+0f8d33dd7243: Pushed
+46fabd5ed495: Pushed
+33e8955054eb: Pushed
+dbfe1df13d6d: Pushed
+c4b8a69e8321: Pushed
+ac85581ace0d: Pushed
+3116d6bb7e34: Pushed
+7ce4521e7cb2: Pushed
+619b503a99a8: Pushed
+defa49bf7f54: Pushed
+ba473bfdf54e: Pushed
+ceb365432eec: Pushed
+
+latest: digest: sha256:f792fe5e97706d8358435dd855884442a2396ab247f7f81e730659ea3da3c1ae size: 2834
+[osai-kube] [OK]    Uploaded supervisor image to artifact registry.
+```
+
+
 
