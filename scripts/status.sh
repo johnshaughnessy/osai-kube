@@ -113,6 +113,7 @@ if [ $SKIP_CONFIG_CHECK -eq 0 ]; then
         print_message "Service account activation failed." "ERROR"
         exit 1
     fi
+    print_message "Service account activated: $ACTIVE_ACCOUNT" "OK"
 
     # Verify that we can list clusters
     CLUSTERS=$(gcloud container clusters list --verbosity="error" --quiet 2>/dev/null)
@@ -132,6 +133,11 @@ if [ $SKIP_CONFIG_CHECK -eq 0 ]; then
     else
         print_message "GCP project: $GCP_PROJECT" "OK"
     fi
+
+
+    # Verify that kubectl has the GKE credentials
+    gcloud container clusters get-credentials $K8S_CLUSTER_NAME --zone $CLOUDSDK_COMPUTE_ZONE --project $GCP_PROJECT >/dev/null 2>&1
+    kubectl config set-context $K8S_CONTEXT_NAME
 
     # Verify the current Kubernetes context
     current_context=$(kubectl config current-context)
