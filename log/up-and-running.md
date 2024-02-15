@@ -143,5 +143,79 @@ latest: digest: sha256:f792fe5e97706d8358435dd855884442a2396ab247f7f81e730659ea3
 [osai-kube] [OK]    Uploaded supervisor image to artifact registry.
 ```
 
+I copied `./kubernetes-manifests/examples-secrets/*` to `./kubernetes-manifests/secrets/` and configured each secret. I made sure to base64 encode each secret. (Not for security: base64 isn't encryption. Just to make sure the secrets are in the right format for kubernetes.)
+
+
+I ran `./scripts/deploy.sh`
+
+```sh
+17:20:27 in ~/src/osai-kube on  main
+➜ ./scripts/deploy.sh
+[osai-kube] [UPDATED]    Updated osai-kube/supervisor in deployments/supervisor-deployment.yaml to sha256:f792fe5e97706d8358435dd855884442a2396ab247f7f81e730659ea3da3c1ae.
+[osai-kube] [UPDATED]    Updated browserlab/doodle in deployments/doodle-deployment.yaml to null.
+[osai-kube] [INFO]       Applying namespace configurations...
+[osai-kube] [CREATED]    Applied namespaces/namespace-osai-kube.yaml
+[osai-kube] [INFO]       Applying CRDs...
+[osai-kube] [CREATED]    Applied crds/traefik.apiextensions.k8s.io.v1.yaml
+[osai-kube] [INFO]       Applying ConfigMaps...
+[osai-kube] [CREATED]    Applied config-maps/pg-hba-config-map.yaml
+[osai-kube] [CREATED]    Applied config-maps/registry-config.yaml
+[osai-kube] [CREATED]    Applied config-maps/init-db-users-config-map.yaml
+[osai-kube] [INFO]       Applying Secrets...
+Secret manifest created: ./scripts/../kubernetes-manifests/secrets/gatekeeper-doodle-secret.yaml
+[osai-kube] [INFO]       Rewrote gatekeeper-doodle-secret.yaml. (Not necessarily changed.)
+[osai-kube] [CREATED]    Applied secrets/keycloak-secret.decode.yaml
+[osai-kube] [CREATED]    Applied secrets/postgresql-admin-secret.yaml
+[osai-kube] [CREATED]    Applied secrets/postgresql-keycloak-secret.yaml
+[osai-kube] [UNCHANGED]  Applied secrets/keycloak-secret.yaml
+[osai-kube] [CREATED]    Applied secrets/postgresql-storage-gateway-secret.yaml
+[osai-kube] [CREATED]    Applied secrets/gatekeeper-doodle-secret.yaml
+[osai-kube] [INFO]       Applying RBAC configurations...
+[osai-kube] [CREATED]    Applied roles/rolebinding.yaml
+[osai-kube] [CREATED]    Applied roles/clusterrole.yaml
+[osai-kube] [CREATED]    Applied roles/role.yaml
+[osai-kube] [CREATED]    Applied roles/deployment-manager-role-binding.yaml
+[osai-kube] [CREATED]    Applied roles/00-traefik-cluster-role.yaml
+[osai-kube] [CREATED]    Applied roles/01-traefik-cluster-role-binding.yaml
+[osai-kube] [CREATED]    Applied roles/clusterrolebinding.yaml
+[osai-kube] [CREATED]    Applied roles/deployment-manager-role.yaml
+[osai-kube] [INFO]       Applying Service Accounts...
+[osai-kube] [CREATED]    Applied service-accounts/00-traefik-service-account.yaml
+[osai-kube] [INFO]       Applying Persistent Volume Claims...
+[osai-kube] [CREATED]    Applied pvcs/traefik-acme-storage.yaml
+[osai-kube] [INFO]       Applying Middleware configurations...
+[osai-kube] [CREATED]    Applied middleware/traefik-middleware.yaml
+[osai-kube] [INFO]       Applying Service configurations...
+[osai-kube] [CREATED]    Applied services/supervisor-service.yaml
+[osai-kube] [CREATED]    Applied services/02-traefik-dashboard-service.yaml
+[osai-kube] [CREATED]    Applied services/doodle-service.yaml
+[osai-kube] [CREATED]    Applied services/03-whoami.yaml
+[osai-kube] [CREATED]    Applied services/keycloak-service.yaml
+[osai-kube] [CREATED]    Applied services/postgresql-service.yaml
+[osai-kube] [CREATED]    Applied services/02-traefik-web-service.yaml
+[osai-kube] [INFO]       Applying StatefulSets...
+[osai-kube] [CREATED]    Applied stateful-sets/postgresql-stateful-set.yaml
+[osai-kube] [INFO]       Applying Deployments...
+[osai-kube] [CREATED]    Applied deployments/keycloak-deployment.yaml
+[osai-kube] [CREATED]    Applied deployments/doodle-deployment.yaml
+[osai-kube] [CREATED]    Applied deployments/02-traefik-deployment.yaml
+[osai-kube] [CREATED]    Applied deployments/supervisor-deployment.yaml
+[osai-kube] [INFO]       Applying DaemonSets...
+[osai-kube] [CREATED]    Applied daemonsets/nvidia-daemonset-preloaded.yaml
+[osai-kube] [INFO]       Applying Ingress configurations...
+[osai-kube] [CREATED]    Applied ingress/doodle-ingress.yaml
+[osai-kube] [CREATED]    Applied ingress/04-whoami-ingress.yaml
+[osai-kube] [CREATED]    Applied ingress/supervisor-ingress-https.yaml
+[osai-kube] [CREATED]    Applied ingress/keycloak-ingress.yaml
+[osai-kube] [INFO]       All configurations have been applied.
+```
+
+I set the `osai-kube` namespace as the default namespace for `kubectl`.
+
+```sh
+kubectl config set-context --current --namespace=osai-kube
+```
+
+
 
 
